@@ -1,8 +1,8 @@
 """
-Custom integration to integrate integration_blueprint with Home Assistant.
+Custom integration to integrate nsw_fuel_ui with Home Assistant.
 
 For more details about this integration, please refer to
-https://github.com/ludeeus/integration_blueprint
+git@github.com:bicycleboy/nsw_fuel_ui.git
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""Custom types for integration_blueprint."""
+"""Custom types for nsw_fuel_ui."""
 
 from __future__ import annotations
 

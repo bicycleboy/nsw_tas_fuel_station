@@ -1,12 +1,12 @@
 {
-  "domain": "integration_blueprint",
-  "name": "Integration blueprint",
+  "domain": "nsw_fuel_ui",
+  "name": "nsw fuel ui",
   "codeowners": [
-    "@ludeeus"
+    "@bicycleboy"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/ludeeus/integration_blueprint",
+  "documentation": "git@github.com:bicycleboy/nsw_fuel_ui.git",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/ludeeus/integration_blueprint/issues",
+  "issue_tracker": "git@github.com:bicycleboy/nsw_fuel_ui.git/issues",
   "version": "0.1.0"
 }
