@@ -123,73 +123,78 @@ class NSWFuelApiClient:
 
         return self._token
 
-    async def _async_request(
-        self, path: str, params: dict[str, Any] | None = None
-    ) -> Any:
+    async def _async_request(self,
+                             path: str,
+                             params: dict[str, Any] | None = None) -> Any:
         """Perform authorized GET request."""
         token = await self.async_get_token()
         if not token:
-            msg = "No access token available"
+            msg = "No access token available for NSW Fuel API request"
             raise NSWFuelApiClientError(msg)
 
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
             "apikey": self._client_id,
-            "TransactionID": str(uuid.uuid4()),  # unique per request
-            "RequestTimestamp": datetime.now(UTC).isoformat(),  # UTC ISO8601
+            "TransactionID": str(uuid.uuid4()),
+            "RequestTimestamp": datetime.now(UTC).isoformat(),
         }
         url = f"{BASE_URL}{path}"
 
-        token_preview = (
-            f"{token[:6]}...{token[-4:]}" if isinstance(token, str) else "<not-str>"
-        )
-        _LOGGER.debug(
-            "Requesting %s with headers=%s",
-            url,
-            {
-                "Authorization": f"Bearer {token_preview}",
-                "Accept": "application/json",
-            },
-        )
+        # Redact sensitive headers for logging
+        redacted_headers = {
+            key: (
+                f"{value[:6]}...{value[-4:]}"
+                if key == "Authorization" and isinstance(value, str)
+                else "REDACTED"
+                if key == "apikey"
+                else value
+            )
+            for key, value in headers.items()
+        }
+        _LOGGER.debug("Requesting %s with headers=%s", url, redacted_headers)
 
         try:
             async with self._session.get(
                 url, headers=headers, params=params, timeout=ClientTimeout(total=30)
             ) as resp:
-                if resp.status == HTTP_UNAUTHORIZED:
-                    body = await resp.text()
-                    _LOGGER.debug("401 response body: %s", body)
-                    _LOGGER.warning("Oauth token expired unexpectedly, refreshing...")
+                status = resp.status
+                try:
+                    data = await resp.json(content_type=None)
+                except Exception: #noqa: BLE001
+                    data = await resp.text()
 
+                if path != REFERENCE_ENDPOINT:
+                    _LOGGER.debug("API Response %s: %s", status, data)
+                else:
+                    _LOGGER.debug("API Response %s", status)
+
+
+                if status == HTTP_UNAUTHORIZED:
+                    _LOGGER.warning("401 Unauthorized, refreshing token...")
                     self._token = None
                     token = await self.async_get_token()
                     if not token:
-                        msg = "Failed to refresh Oauth token"
-                        raise NSWFuelApiClientAuthError(msg)  # noqa: TRY301
-
+                        msg = "Failed to refresh token after 401 Unauthorized"
+                        raise NSWFuelApiClientAuthError(msg) #noqa: TRY301
                     headers["Authorization"] = f"Bearer {token}"
-                    token_preview = f"{token[:6]}...{token[-4:]}"
-                    _LOGGER.debug(
-                        "Retrying %s with headers=%s",
-                        url,
-                        {
-                            "Authorization": f"Bearer {token_preview}",
-                            "Accept": "application/json",
-                        },
-                    )
 
-                    async with self._session.get(
-                        url,
-                        headers=headers,
-                        params=params,
-                        timeout=ClientTimeout(total=30),
+                    async with self._session.get(url,
+                                                 headers=headers,
+                                                 params=params,
+                                                 timeout=ClientTimeout(total=30)
                     ) as retry:
+                        retry_status = retry.status
+                        try:
+                            retry_data = await retry.json(content_type=None)
+                        except Exception:  # noqa: BLE001
+                            retry_data = await retry.text()
+                        _LOGGER.debug("Retry Response %s: %s", retry_status, retry_data)
                         retry.raise_for_status()
-                        return await retry.json(content_type=None)
+                        return retry_data
 
                 resp.raise_for_status()
-                return await resp.json(content_type=None)
+                return data
 
         except ClientResponseError as err:
             if err.status == HTTP_UNAUTHORIZED:

@@ -7,6 +7,7 @@ git@github.com:bicycleboy/nsw_fuel_ui.git
 
 from __future__ import annotations
 
+import datetime
 import logging
 from typing import TYPE_CHECKING
 
@@ -27,6 +28,7 @@ PLATFORMS = [Platform.SENSOR]
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
 
+DEFAULT_SCAN_INTERVAL = datetime.timedelta(minutes=60)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""

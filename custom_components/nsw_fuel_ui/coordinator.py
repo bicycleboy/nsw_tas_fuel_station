@@ -49,6 +49,7 @@ class NSWFuelCoordinator(DataUpdateCoordinator):
 
             # Fetch station prices daily
             price_data = await self.api.async_get_station_price(self.station_code)
+            _LOGGER.debug("_async_update_data Fetched price data: %s", price_data)
             return {
                 "reference": self._reference_data,
                 "prices": price_data,
