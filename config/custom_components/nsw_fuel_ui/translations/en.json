@@ -2,15 +2,16 @@
     "config": {
         "step": {
             "user": {
-                "description": "If you need help with the configuration have a look here: git@github.com:bicycleboy/nsw_fuel_ui.git",
+                "description": "Visit api.nsw.gov.au, subscribe to the FuelCheck API and create an app to obtain your API Key and Secret.",
                 "data": {
-                    "username": "Username",
-                    "password": "Password"
+                    "client_id": "API Key",
+                    "client_secret": "API Secret",
+                    "station_code": "Fuel Station Code"
                 }
             }
         },
         "error": {
-            "auth": "Username/Password is wrong.",
+            "auth": "API Key or API Secret is wrong.",
             "connection": "Unable to connect to the server.",
             "unknown": "Unknown error occurred."
         },

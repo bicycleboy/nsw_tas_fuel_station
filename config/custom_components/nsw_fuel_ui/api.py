@@ -3,11 +3,20 @@
 from __future__ import annotations
 
 import base64
+import json
 import logging
 import time
+import uuid
+from datetime import UTC, datetime
 from typing import Any
 
-from aiohttp import ClientError, ClientResponseError, ClientSession
+from aiohttp import (
+    ClientConnectionError,
+    ClientError,
+    ClientResponseError,
+    ClientSession,
+    ClientTimeout,
+)
 
 from .const import AUTH_URL, BASE_URL, PRICE_ENDPOINT, REFERENCE_ENDPOINT
 
@@ -36,8 +45,9 @@ class NSWFuelApiClient:
         self._token: str | None = None
         self._token_expiry: float = 0
 
-    async def _async_get_token(self) -> str:
+    async def async_get_token(self) -> str | None:
         """Get or refresh OAuth2 token from the NSW Fuel API."""
+        _LOGGER.debug("async_get_token called")
         now = time.time()
 
         # Refresh if no token or it will expire soon
@@ -53,6 +63,7 @@ class NSWFuelApiClient:
                 "Accept": "application/json",
                 "Authorization": f"Basic {auth_b64}",
             }
+            _LOGGER.debug("Instance of NSWFuelApiClient created: id=%s", id(self))
 
             try:
                 async with self._session.get(
@@ -69,12 +80,24 @@ class NSWFuelApiClient:
 
                 # Some NSW APIs mislabel JSON as x-www-form-urlencoded
                 if "application/json" in resp.content_type:
-                    result = await resp.json()
+                    try:
+                        result = await resp.json()
+                    except ClientConnectionError as err:
+                        _LOGGER.exception("Connection dropped while parsing token")
+                        msg = "Connection lost during token fetch"
+                        raise NSWFuelApiClientError(msg) from err
                 else:
-                    _LOGGER.warning("Falling back to JSON parse for token response")
-                    result = json.loads(text)
+                    _LOGGER.warning(
+                        "Expected application/json, got %s", resp.content_type
+                    )
+                    try:
+                        result = json.loads(text)
+                    except json.JSONDecodeError as err:
+                        msg = "Failed to parse token response"
+                        raise NSWFuelApiClientError(msg) from err
 
             except ClientResponseError as err:
+
                 if err.status == HTTP_UNAUTHORIZED:
                     msg = "Invalid NSW Fuel API credentials"
                     raise NSWFuelApiClientAuthError(msg) from err
@@ -86,10 +109,17 @@ class NSWFuelApiClient:
                 raise NSWFuelApiClientError(msg) from err
 
             # Parse result and cache token
-            self._token = result.get("access_token")
-            expires_in = int(result.get("expires_in", 3600))
-            self._token_expiry = now + expires_in
-            _LOGGER.debug("Token acquired; expires in %s seconds", expires_in)
+            access_token = result.get("access_token")
+            if access_token is not None:
+                self._token = access_token
+                expires_in = int(result.get("expires_in", 3600))
+                self._token_expiry = now + expires_in
+                _LOGGER.debug("Token acquired; expires in %s seconds", expires_in)
+            else:
+                self._token = None
+                msg = "No access_token in NSW Fuel token response"
+                raise NSWFuelApiClientError(msg)
+
 
         return self._token
 
@@ -97,28 +127,69 @@ class NSWFuelApiClient:
         self, path: str, params: dict[str, Any] | None = None
     ) -> Any:
         """Perform authorized GET request."""
-        token = await self._async_get_token()
-        headers = {"Authorization": f"Bearer {token}"}
+        token = await self.async_get_token()
+        if not token:
+            msg = "No access token available"
+            raise NSWFuelApiClientError(msg)
+
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+            "apikey": self._client_id,
+            "TransactionID": str(uuid.uuid4()),  # unique per request
+            "RequestTimestamp": datetime.now(UTC).isoformat(),  # UTC ISO8601
+        }
         url = f"{BASE_URL}{path}"
+
+        token_preview = (
+            f"{token[:6]}...{token[-4:]}" if isinstance(token, str) else "<not-str>"
+        )
+        _LOGGER.debug(
+            "Requesting %s with headers=%s",
+            url,
+            {
+                "Authorization": f"Bearer {token_preview}",
+                "Accept": "application/json",
+            },
+        )
 
         try:
             async with self._session.get(
-                url, headers=headers, params=params, timeout=30
+                url, headers=headers, params=params, timeout=ClientTimeout(total=30)
             ) as resp:
                 if resp.status == HTTP_UNAUTHORIZED:
-                    _LOGGER.warning("Token expired unexpectedly, refreshing...")
+                    body = await resp.text()
+                    _LOGGER.debug("401 response body: %s", body)
+                    _LOGGER.warning("Oauth token expired unexpectedly, refreshing...")
+
                     self._token = None
-                    # Try once more with a new token
-                    token = await self._async_get_token()
+                    token = await self.async_get_token()
+                    if not token:
+                        msg = "Failed to refresh Oauth token"
+                        raise NSWFuelApiClientAuthError(msg)  # noqa: TRY301
+
                     headers["Authorization"] = f"Bearer {token}"
+                    token_preview = f"{token[:6]}...{token[-4:]}"
+                    _LOGGER.debug(
+                        "Retrying %s with headers=%s",
+                        url,
+                        {
+                            "Authorization": f"Bearer {token_preview}",
+                            "Accept": "application/json",
+                        },
+                    )
+
                     async with self._session.get(
-                        url, headers=headers, params=params, timeout=30
+                        url,
+                        headers=headers,
+                        params=params,
+                        timeout=ClientTimeout(total=30),
                     ) as retry:
                         retry.raise_for_status()
-                        return await retry.json()
+                        return await retry.json(content_type=None)
 
                 resp.raise_for_status()
-                return await resp.json()
+                return await resp.json(content_type=None)
 
         except ClientResponseError as err:
             if err.status == HTTP_UNAUTHORIZED:

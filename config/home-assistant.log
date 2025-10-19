@@ -1,0 +1,545 @@
+2025-10-19 02:21:18.041 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration nsw_fuel_ui which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2025-10-19 02:21:19.115 INFO (MainThread) [homeassistant.setup] Setup of domain system_log took 0.06 seconds
+2025-10-19 02:21:19.115 INFO (MainThread) [homeassistant.setup] Setup of domain logger took 0.06 seconds
+2025-10-19 02:21:19.115 INFO (MainThread) [homeassistant.bootstrap] Setting up frontend: {'backup', 'frontend'}
+2025-10-19 02:21:19.116 INFO (MainThread) [homeassistant.setup] Setting up http
+2025-10-19 02:21:19.116 INFO (MainThread) [homeassistant.setup] Setting up device_automation
+2025-10-19 02:21:19.116 INFO (MainThread) [homeassistant.setup] Setup of domain device_automation took 0.00 seconds
+2025-10-19 02:21:19.118 WARNING (MainThread) [aiohttp_fast_zlib] zlib_ng and isal are not available, falling back to zlib, performance will be degraded.
+2025-10-19 02:21:19.121 INFO (MainThread) [homeassistant.setup] Setup of domain http took 0.01 seconds
+2025-10-19 02:21:19.121 INFO (MainThread) [homeassistant.setup] Setting up websocket_api
+2025-10-19 02:21:19.122 INFO (MainThread) [homeassistant.setup] Setup of domain websocket_api took 0.00 seconds
+2025-10-19 02:21:19.122 INFO (MainThread) [homeassistant.setup] Setting up api
+2025-10-19 02:21:19.123 INFO (MainThread) [homeassistant.setup] Setup of domain api took 0.00 seconds
+2025-10-19 02:21:19.123 INFO (MainThread) [homeassistant.setup] Setting up auth
+2025-10-19 02:21:19.123 INFO (MainThread) [homeassistant.setup] Setup of domain auth took 0.00 seconds
+2025-10-19 02:21:19.123 INFO (MainThread) [homeassistant.setup] Setting up config
+2025-10-19 02:21:19.125 INFO (MainThread) [homeassistant.setup] Setup of domain config took 0.00 seconds
+2025-10-19 02:21:19.125 INFO (MainThread) [homeassistant.setup] Setting up diagnostics
+2025-10-19 02:21:19.126 INFO (MainThread) [homeassistant.setup] Setup of domain diagnostics took 0.00 seconds
+2025-10-19 02:21:19.126 INFO (MainThread) [homeassistant.setup] Setting up file_upload
+2025-10-19 02:21:19.126 INFO (MainThread) [homeassistant.setup] Setup of domain file_upload took 0.00 seconds
+2025-10-19 02:21:19.127 INFO (MainThread) [homeassistant.setup] Setting up repairs
+2025-10-19 02:21:19.127 INFO (MainThread) [homeassistant.setup] Setup of domain repairs took 0.00 seconds
+2025-10-19 02:21:19.128 INFO (MainThread) [homeassistant.setup] Setting up search
+2025-10-19 02:21:19.128 INFO (MainThread) [homeassistant.setup] Setup of domain search took 0.00 seconds
+2025-10-19 02:21:19.134 INFO (MainThread) [homeassistant.setup] Setting up image_upload
+2025-10-19 02:21:19.135 INFO (MainThread) [homeassistant.setup] Setup of domain image_upload took 0.00 seconds
+2025-10-19 02:21:19.136 INFO (MainThread) [homeassistant.setup] Setting up person
+2025-10-19 02:21:19.143 INFO (MainThread) [homeassistant.setup] Setup of domain person took 0.01 seconds
+2025-10-19 02:21:19.174 INFO (MainThread) [homeassistant.setup] Setting up backup
+2025-10-19 02:21:19.183 INFO (MainThread) [homeassistant.setup] Setup of domain backup took 0.01 seconds
+2025-10-19 02:21:19.184 INFO (MainThread) [homeassistant.setup] Setting up onboarding
+2025-10-19 02:21:19.184 INFO (MainThread) [homeassistant.setup] Setup of domain onboarding took 0.00 seconds
+2025-10-19 02:21:19.184 INFO (MainThread) [homeassistant.setup] Setting up lovelace
+2025-10-19 02:21:19.186 INFO (MainThread) [homeassistant.setup] Setup of domain lovelace took 0.00 seconds
+2025-10-19 02:21:19.193 INFO (MainThread) [homeassistant.setup] Setting up frontend
+2025-10-19 02:21:19.204 INFO (MainThread) [homeassistant.setup] Setup of domain frontend took 0.01 seconds
+2025-10-19 02:21:19.204 INFO (MainThread) [homeassistant.bootstrap] Setting up recorder: {'recorder'}
+2025-10-19 02:21:19.214 INFO (MainThread) [homeassistant.components.http] Now listening on port 8123
+2025-10-19 02:21:19.215 INFO (MainThread) [homeassistant.setup] Setup of domain http took 0.01 seconds
+2025-10-19 02:21:19.225 INFO (MainThread) [homeassistant.setup] Setting up recorder
+2025-10-19 02:21:19.276 INFO (MainThread) [homeassistant.setup] Setup of domain recorder took 0.05 seconds
+2025-10-19 02:21:19.276 INFO (MainThread) [homeassistant.bootstrap] Setting up stage 1: {'http', 'cloud', 'repairs', 'network', 'bluetooth', 'usb', 'api', 'websocket_api', 'auth', 'webhook', 'ssdp', 'dhcp', 'zeroconf'}
+2025-10-19 02:21:19.277 INFO (MainThread) [homeassistant.setup] Setting up webhook
+2025-10-19 02:21:19.277 INFO (MainThread) [homeassistant.setup] Setup of domain webhook took 0.00 seconds
+2025-10-19 02:21:19.277 INFO (MainThread) [homeassistant.setup] Setting up network
+2025-10-19 02:21:19.279 INFO (MainThread) [homeassistant.setup] Setup of domain network took 0.00 seconds
+2025-10-19 02:21:19.280 INFO (MainThread) [homeassistant.setup] Setting up zeroconf
+2025-10-19 02:21:19.282 INFO (MainThread) [homeassistant.components.zeroconf] Starting Zeroconf broadcast
+2025-10-19 02:21:19.282 INFO (MainThread) [homeassistant.setup] Setup of domain zeroconf took 0.00 seconds
+2025-10-19 02:21:19.568 INFO (MainThread) [homeassistant.setup] Setting up cloud
+2025-10-19 02:21:19.574 INFO (MainThread) [homeassistant.setup] Setting up ffmpeg
+2025-10-19 02:21:19.577 INFO (MainThread) [homeassistant.setup] Setup of domain cloud took 0.01 seconds
+2025-10-19 02:21:19.595 INFO (MainThread) [homeassistant.setup] Setting up usb
+2025-10-19 02:21:19.595 INFO (MainThread) [homeassistant.setup] Setup of domain usb took 0.00 seconds
+2025-10-19 02:21:19.647 INFO (MainThread) [homeassistant.setup] Setting up ssdp
+2025-10-19 02:21:19.650 INFO (MainThread) [homeassistant.setup] Setup of domain ssdp took 0.00 seconds
+2025-10-19 02:21:19.739 INFO (MainThread) [homeassistant.setup] Setup of domain ffmpeg took 0.17 seconds
+2025-10-19 02:21:19.740 INFO (MainThread) [homeassistant.setup] Setting up tts
+2025-10-19 02:21:19.748 INFO (MainThread) [homeassistant.setup] Setting up dhcp
+2025-10-19 02:21:19.749 INFO (MainThread) [homeassistant.setup] Setup of domain dhcp took 0.00 seconds
+2025-10-19 02:21:19.756 INFO (MainThread) [homeassistant.setup] Setup of domain tts took 0.02 seconds
+2025-10-19 02:21:19.835 INFO (MainThread) [homeassistant.setup] Setting up bluetooth
+2025-10-19 02:21:19.897 INFO (MainThread) [homeassistant.setup] Setup of domain bluetooth took 0.06 seconds
+2025-10-19 02:21:19.897 INFO (MainThread) [homeassistant.bootstrap] Setting up stage 2: {'blueprint', 'system_health', 'assist_pipeline', 'person', 'go2rtc', 'logbook', 'my', 'input_boolean', 'input_button', 'device_automation', 'timer', 'image_upload', 'analytics', 'trace', 'input_select', 'file_upload', 'scene', 'conversation', 'mobile_app', 'default_config', 'zone', 'tts', 'schedule', 'stt', 'lovelace', 'sun', 'input_number', 'onboarding', 'application_credentials', 'hardware', 'wake_word', 'tag', 'input_datetime', 'history', 'input_text', 'diagnostics', 'energy', 'homeassistant_alerts', 'config', 'intent', 'stream', 'camera', 'search', 'media_source', 'ffmpeg', 'counter', 'automation', 'script'}
+2025-10-19 02:21:19.898 INFO (MainThread) [homeassistant.setup] Setting up stt
+2025-10-19 02:21:19.898 INFO (MainThread) [homeassistant.setup] Setup of domain stt took 0.00 seconds
+2025-10-19 02:21:19.898 INFO (MainThread) [homeassistant.setup] Setting up wake_word
+2025-10-19 02:21:19.899 INFO (MainThread) [homeassistant.setup] Setup of domain wake_word took 0.00 seconds
+2025-10-19 02:21:19.899 INFO (MainThread) [homeassistant.setup] Setting up camera
+2025-10-19 02:21:19.900 INFO (MainThread) [homeassistant.setup] Setup of domain camera took 0.00 seconds
+2025-10-19 02:21:19.900 INFO (MainThread) [homeassistant.setup] Setting up scene
+2025-10-19 02:21:19.901 INFO (MainThread) [homeassistant.setup] Setup of domain scene took 0.00 seconds
+2025-10-19 02:21:19.901 INFO (MainThread) [homeassistant.setup] Setting up intent
+2025-10-19 02:21:19.901 INFO (MainThread) [homeassistant.setup] Setup of domain intent took 0.00 seconds
+2025-10-19 02:21:19.901 INFO (MainThread) [homeassistant.setup] Setting up conversation
+2025-10-19 02:21:19.902 INFO (MainThread) [homeassistant.setup] Setup of domain conversation took 0.00 seconds
+2025-10-19 02:21:19.902 INFO (MainThread) [homeassistant.setup] Setting up zone
+2025-10-19 02:21:19.906 INFO (MainThread) [homeassistant.setup] Setup of domain zone took 0.00 seconds
+2025-10-19 02:21:19.906 INFO (MainThread) [homeassistant.setup] Setting up blueprint
+2025-10-19 02:21:19.907 INFO (MainThread) [homeassistant.setup] Setup of domain blueprint took 0.00 seconds
+2025-10-19 02:21:19.908 INFO (MainThread) [homeassistant.setup] Setting up assist_pipeline
+2025-10-19 02:21:19.908 INFO (MainThread) [homeassistant.setup] Setup of domain assist_pipeline took 0.00 seconds
+2025-10-19 02:21:19.908 INFO (MainThread) [homeassistant.setup] Setting up system_health
+2025-10-19 02:21:19.909 INFO (MainThread) [homeassistant.setup] Setup of domain system_health took 0.00 seconds
+2025-10-19 02:21:19.909 INFO (MainThread) [homeassistant.setup] Setting up input_number
+2025-10-19 02:21:19.910 INFO (MainThread) [homeassistant.setup] Setup of domain input_number took 0.00 seconds
+2025-10-19 02:21:19.910 INFO (MainThread) [homeassistant.setup] Setting up logbook
+2025-10-19 02:21:19.910 INFO (MainThread) [homeassistant.setup] Setup of domain logbook took 0.00 seconds
+2025-10-19 02:21:19.911 INFO (MainThread) [homeassistant.setup] Setting up history
+2025-10-19 02:21:19.911 INFO (MainThread) [homeassistant.setup] Setup of domain history took 0.00 seconds
+2025-10-19 02:21:19.911 INFO (MainThread) [homeassistant.setup] Setting up input_boolean
+2025-10-19 02:21:19.912 INFO (MainThread) [homeassistant.setup] Setup of domain input_boolean took 0.00 seconds
+2025-10-19 02:21:19.912 INFO (MainThread) [homeassistant.setup] Setting up stream
+2025-10-19 02:21:19.913 INFO (MainThread) [homeassistant.setup] Setting up input_button
+2025-10-19 02:21:19.914 INFO (MainThread) [homeassistant.setup] Setup of domain input_button took 0.00 seconds
+2025-10-19 02:21:19.915 INFO (MainThread) [homeassistant.setup] Setting up timer
+2025-10-19 02:21:19.915 INFO (MainThread) [homeassistant.setup] Setup of domain timer took 0.00 seconds
+2025-10-19 02:21:19.916 INFO (MainThread) [homeassistant.setup] Setting up media_source
+2025-10-19 02:21:19.916 INFO (MainThread) [homeassistant.setup] Setup of domain media_source took 0.00 seconds
+2025-10-19 02:21:19.917 INFO (MainThread) [homeassistant.setup] Setting up trace
+2025-10-19 02:21:19.917 INFO (MainThread) [homeassistant.setup] Setup of domain trace took 0.00 seconds
+2025-10-19 02:21:19.917 INFO (MainThread) [homeassistant.setup] Setting up input_select
+2025-10-19 02:21:19.918 INFO (MainThread) [homeassistant.setup] Setup of domain input_select took 0.00 seconds
+2025-10-19 02:21:19.919 INFO (MainThread) [homeassistant.setup] Setting up automation
+2025-10-19 02:21:19.919 INFO (MainThread) [homeassistant.setup] Setup of domain automation took 0.00 seconds
+2025-10-19 02:21:19.919 INFO (MainThread) [homeassistant.setup] Setting up script
+2025-10-19 02:21:19.920 INFO (MainThread) [homeassistant.setup] Setup of domain script took 0.00 seconds
+2025-10-19 02:21:19.923 INFO (MainThread) [homeassistant.components.scene] Setting up homeassistant.scene
+2025-10-19 02:21:19.956 INFO (MainThread) [homeassistant.setup] Setting up schedule
+2025-10-19 02:21:19.960 INFO (MainThread) [homeassistant.setup] Setup of domain schedule took 0.00 seconds
+2025-10-19 02:21:19.989 INFO (MainThread) [homeassistant.setup] Setting up sun
+2025-10-19 02:21:19.990 INFO (MainThread) [homeassistant.setup] Setup of domain sun took 0.00 seconds
+2025-10-19 02:21:19.993 INFO (MainThread) [homeassistant.setup] Setting up sensor
+2025-10-19 02:21:19.993 INFO (MainThread) [homeassistant.setup] Setup of domain sensor took 0.00 seconds
+2025-10-19 02:21:19.994 INFO (MainThread) [homeassistant.components.sensor] Setting up sun.sensor
+2025-10-19 02:21:20.013 INFO (MainThread) [homeassistant.setup] Setting up application_credentials
+2025-10-19 02:21:20.015 INFO (MainThread) [homeassistant.setup] Setup of domain application_credentials took 0.00 seconds
+2025-10-19 02:21:20.057 INFO (MainThread) [homeassistant.setup] Setting up hardware
+2025-10-19 02:21:20.113 INFO (MainThread) [homeassistant.setup] Setup of domain stream took 0.20 seconds
+2025-10-19 02:21:20.173 INFO (MainThread) [homeassistant.setup] Setup of domain hardware took 0.12 seconds
+2025-10-19 02:21:20.182 INFO (MainThread) [homeassistant.setup] Setting up go2rtc
+2025-10-19 02:21:20.186 ERROR (MainThread) [homeassistant.components.go2rtc] Could not find go2rtc docker binary
+2025-10-19 02:21:20.186 ERROR (MainThread) [homeassistant.setup] Setup failed for 'go2rtc': Integration failed to initialize.
+2025-10-19 02:21:20.186 INFO (MainThread) [homeassistant.setup] Setup of domain go2rtc took 0.00 seconds
+2025-10-19 02:21:20.193 INFO (MainThread) [homeassistant.setup] Setting up tag
+2025-10-19 02:21:20.194 INFO (MainThread) [homeassistant.setup] Setup of domain tag took 0.00 seconds
+2025-10-19 02:21:20.196 INFO (MainThread) [homeassistant.setup] Setting up input_datetime
+2025-10-19 02:21:20.200 INFO (MainThread) [homeassistant.setup] Setup of domain input_datetime took 0.00 seconds
+2025-10-19 02:21:20.203 INFO (MainThread) [homeassistant.setup] Setting up input_text
+2025-10-19 02:21:20.205 INFO (MainThread) [homeassistant.setup] Setup of domain input_text took 0.00 seconds
+2025-10-19 02:21:20.216 INFO (MainThread) [homeassistant.setup] Setting up energy
+2025-10-19 02:21:20.217 INFO (MainThread) [homeassistant.setup] Setup of domain energy took 0.00 seconds
+2025-10-19 02:21:20.223 INFO (MainThread) [homeassistant.setup] Setting up homeassistant_alerts
+2025-10-19 02:21:20.223 INFO (MainThread) [homeassistant.setup] Setup of domain homeassistant_alerts took 0.00 seconds
+2025-10-19 02:21:20.226 INFO (MainThread) [homeassistant.setup] Setting up my
+2025-10-19 02:21:20.227 INFO (MainThread) [homeassistant.setup] Setup of domain my took 0.00 seconds
+2025-10-19 02:21:20.228 INFO (MainThread) [homeassistant.setup] Setting up counter
+2025-10-19 02:21:20.230 INFO (MainThread) [homeassistant.setup] Setup of domain counter took 0.00 seconds
+2025-10-19 02:21:20.274 INFO (MainThread) [homeassistant.setup] Setting up mobile_app
+2025-10-19 02:21:20.275 INFO (MainThread) [homeassistant.setup] Setting up notify
+2025-10-19 02:21:20.281 INFO (MainThread) [homeassistant.setup] Setup of domain notify took 0.01 seconds
+2025-10-19 02:21:20.281 INFO (MainThread) [homeassistant.setup] Setup of domain mobile_app took 0.01 seconds
+2025-10-19 02:21:20.281 INFO (MainThread) [homeassistant.components.sensor] Setting up energy.sensor
+2025-10-19 02:21:20.282 INFO (MainThread) [homeassistant.components.notify] Setting up notify.mobile_app
+2025-10-19 02:21:20.282 ERROR (MainThread) [homeassistant.setup] Unable to set up dependencies of 'default_config'. Setup failed for dependencies: ['go2rtc']
+2025-10-19 02:21:20.282 ERROR (MainThread) [homeassistant.setup] Setup failed for 'default_config': Could not setup dependencies: go2rtc
+2025-10-19 02:21:20.286 INFO (MainThread) [homeassistant.setup] Setting up analytics
+2025-10-19 02:21:20.287 INFO (MainThread) [homeassistant.setup] Setup of domain analytics took 0.00 seconds
+2025-10-19 02:21:20.293 INFO (MainThread) [homeassistant.bootstrap] Home Assistant initialized in 2.26s
+2025-10-19 02:21:20.294 INFO (MainThread) [homeassistant.core] Starting Home Assistant
+2025-10-19 02:21:25.895 INFO (SyncWorker_2) [homeassistant.loader] Loaded local_todo from homeassistant.components.local_todo
+2025-10-19 02:21:25.896 INFO (SyncWorker_2) [homeassistant.loader] Loaded random from homeassistant.components.random
+2025-10-19 02:21:25.896 INFO (SyncWorker_2) [homeassistant.loader] Loaded statistics from homeassistant.components.statistics
+2025-10-19 02:21:25.899 INFO (SyncWorker_2) [homeassistant.loader] Loaded filter from homeassistant.components.filter
+2025-10-19 02:21:25.900 INFO (SyncWorker_2) [homeassistant.loader] Loaded garages_amsterdam from homeassistant.components.garages_amsterdam
+2025-10-19 02:21:25.902 INFO (SyncWorker_2) [homeassistant.loader] Loaded uptime from homeassistant.components.uptime
+2025-10-19 02:21:25.904 INFO (SyncWorker_2) [homeassistant.loader] Loaded holiday from homeassistant.components.holiday
+2025-10-19 02:21:25.905 INFO (SyncWorker_2) [homeassistant.loader] Loaded local_ip from homeassistant.components.local_ip
+2025-10-19 02:21:25.906 INFO (SyncWorker_2) [homeassistant.loader] Loaded shopping_list from homeassistant.components.shopping_list
+2025-10-19 02:21:25.911 INFO (SyncWorker_2) [homeassistant.loader] Loaded emulated_roku from homeassistant.components.emulated_roku
+2025-10-19 02:21:25.918 INFO (SyncWorker_2) [homeassistant.loader] Loaded utility_meter from homeassistant.components.utility_meter
+2025-10-19 02:21:25.918 INFO (SyncWorker_2) [homeassistant.loader] Loaded generic_thermostat from homeassistant.components.generic_thermostat
+2025-10-19 02:21:25.921 INFO (SyncWorker_2) [homeassistant.loader] Loaded local_calendar from homeassistant.components.local_calendar
+2025-10-19 02:21:25.923 INFO (SyncWorker_2) [homeassistant.loader] Loaded cpuspeed from homeassistant.components.cpuspeed
+2025-10-19 02:21:25.924 INFO (SyncWorker_2) [homeassistant.loader] Loaded mold_indicator from homeassistant.components.mold_indicator
+2025-10-19 02:21:25.924 INFO (SyncWorker_2) [homeassistant.loader] Loaded min_max from homeassistant.components.min_max
+2025-10-19 02:21:25.924 INFO (SyncWorker_2) [homeassistant.loader] Loaded demo from homeassistant.components.demo
+2025-10-19 02:21:25.926 INFO (SyncWorker_2) [homeassistant.loader] Loaded history_stats from homeassistant.components.history_stats
+2025-10-19 02:21:25.929 INFO (SyncWorker_2) [homeassistant.loader] Loaded nmap_tracker from homeassistant.components.nmap_tracker
+2025-10-19 02:21:25.930 INFO (SyncWorker_2) [homeassistant.loader] Loaded moehlenhoff_alpha2 from homeassistant.components.moehlenhoff_alpha2
+2025-10-19 02:21:25.935 INFO (SyncWorker_2) [homeassistant.loader] Loaded zodiac from homeassistant.components.zodiac
+2025-10-19 02:21:25.989 INFO (SyncWorker_2) [homeassistant.loader] Loaded derivative from homeassistant.components.derivative
+2025-10-19 02:21:25.991 INFO (SyncWorker_2) [homeassistant.loader] Loaded integration from homeassistant.components.integration
+2025-10-19 02:21:25.993 INFO (SyncWorker_2) [homeassistant.loader] Loaded cert_expiry from homeassistant.components.cert_expiry
+2025-10-19 02:21:25.995 INFO (SyncWorker_2) [homeassistant.loader] Loaded generic from homeassistant.components.generic
+2025-10-19 02:21:25.996 INFO (SyncWorker_2) [homeassistant.loader] Loaded plant from homeassistant.components.plant
+2025-10-19 02:21:25.997 INFO (SyncWorker_2) [homeassistant.loader] Loaded google_travel_time from homeassistant.components.google_travel_time
+2025-10-19 02:21:25.998 INFO (SyncWorker_2) [homeassistant.loader] Loaded moon from homeassistant.components.moon
+2025-10-19 02:21:26.001 INFO (SyncWorker_2) [homeassistant.loader] Loaded version from homeassistant.components.version
+2025-10-19 02:21:26.002 INFO (SyncWorker_2) [homeassistant.loader] Loaded islamic_prayer_times from homeassistant.components.islamic_prayer_times
+2025-10-19 02:21:26.004 INFO (SyncWorker_2) [homeassistant.loader] Loaded generic_hygrostat from homeassistant.components.generic_hygrostat
+2025-10-19 02:21:26.005 INFO (SyncWorker_2) [homeassistant.loader] Loaded waze_travel_time from homeassistant.components.waze_travel_time
+2025-10-19 02:21:26.006 INFO (SyncWorker_2) [homeassistant.loader] Loaded energenie_power_sockets from homeassistant.components.energenie_power_sockets
+2025-10-19 02:21:26.006 INFO (SyncWorker_2) [homeassistant.loader] Loaded nextbus from homeassistant.components.nextbus
+2025-10-19 02:21:26.008 INFO (SyncWorker_2) [homeassistant.loader] Loaded rpi_power from homeassistant.components.rpi_power
+2025-10-19 02:21:26.009 INFO (SyncWorker_2) [homeassistant.loader] Loaded threshold from homeassistant.components.threshold
+2025-10-19 02:21:26.010 INFO (SyncWorker_2) [homeassistant.loader] Loaded filesize from homeassistant.components.filesize
+2025-10-19 02:21:26.011 INFO (SyncWorker_2) [homeassistant.loader] Loaded workday from homeassistant.components.workday
+2025-10-19 02:21:26.015 INFO (SyncWorker_2) [homeassistant.loader] Loaded homekit_controller from homeassistant.components.homekit_controller
+2025-10-19 02:21:26.019 INFO (SyncWorker_2) [homeassistant.loader] Loaded growatt_server from homeassistant.components.growatt_server
+2025-10-19 02:21:26.021 INFO (SyncWorker_2) [homeassistant.loader] Loaded season from homeassistant.components.season
+2025-10-19 02:21:26.022 INFO (SyncWorker_2) [homeassistant.loader] Loaded alert from homeassistant.components.alert
+2025-10-19 02:21:26.024 INFO (SyncWorker_2) [homeassistant.loader] Loaded aurora from homeassistant.components.aurora
+2025-10-19 02:21:26.026 INFO (SyncWorker_2) [homeassistant.loader] Loaded proximity from homeassistant.components.proximity
+2025-10-19 02:21:26.031 INFO (SyncWorker_2) [homeassistant.loader] Loaded time_date from homeassistant.components.time_date
+2025-10-19 02:21:26.032 INFO (SyncWorker_2) [homeassistant.loader] Loaded trend from homeassistant.components.trend
+2025-10-19 02:21:26.036 INFO (SyncWorker_2) [homeassistant.loader] Loaded tod from homeassistant.components.tod
+2025-10-19 02:21:35.310 DEBUG (MainThread) [custom_components.nsw_fuel_ui] _test_credentials called
+2025-10-19 02:21:35.310 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:21:35.310 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Refreshing NSW Fuel API token
+2025-10-19 02:21:35.310 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Instance of NSWFuelApiClient created: id=139868023781232
+2025-10-19 02:21:35.447 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Token response status=200, content_type=application/json, params={'grant_type': 'client_credentials'}
+2025-10-19 02:21:35.447 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Token acquired; expires in 43199 seconds
+2025-10-19 02:21:35.447 INFO (MainThread) [homeassistant.setup] Setting up nsw_fuel_ui
+2025-10-19 02:21:35.447 DEBUG (MainThread) [custom_components.nsw_fuel_ui] NSWFuelApiClient created
+2025-10-19 02:21:35.447 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:21:35.448 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Refreshing NSW Fuel API token
+2025-10-19 02:21:35.448 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Instance of NSWFuelApiClient created: id=139868018790544
+2025-10-19 02:21:35.493 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Token response status=200, content_type=application/json, params={'grant_type': 'client_credentials'}
+2025-10-19 02:21:35.493 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Token acquired; expires in 43199 seconds
+2025-10-19 02:21:35.493 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelCheckRefData/v2/fuel/lovs with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:21:36.554 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:21:36.554 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:21:36.655 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 1.207 seconds (success: True)
+2025-10-19 02:21:36.662 INFO (MainThread) [homeassistant.components.sensor] Setting up nsw_fuel_ui.sensor
+2025-10-19 02:21:36.662 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:21:36.662 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:21:36.742 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.080 seconds (success: True)
+2025-10-19 02:21:36.743 INFO (MainThread) [homeassistant.helpers.entity_registry] Registered new sensor.nsw_fuel_ui entity: sensor.fuel_price
+2025-10-19 02:21:36.743 ERROR (MainThread) [homeassistant.components.sensor] Error adding entity sensor.fuel_price for domain sensor with platform nsw_fuel_ui
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 928, in _async_add_entity
+    await entity.add_to_platform_finish()
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1384, in add_to_platform_finish
+    self.async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1023, in async_write_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:22:06.773 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:22:06.773 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:22:06.972 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.199 seconds (success: True)
+2025-10-19 02:22:06.973 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:22:36.776 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:22:36.776 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:22:36.904 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.128 seconds (success: True)
+2025-10-19 02:22:36.904 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:23:06.778 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:23:06.778 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:23:07.111 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.332 seconds (success: True)
+2025-10-19 02:23:07.111 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:23:36.780 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:23:36.780 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:23:36.914 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.134 seconds (success: True)
+2025-10-19 02:23:36.914 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:24:06.783 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:24:06.783 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:24:06.953 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.170 seconds (success: True)
+2025-10-19 02:24:06.953 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:24:36.786 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:24:36.786 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:24:36.940 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.154 seconds (success: True)
+2025-10-19 02:24:36.940 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:25:06.788 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:25:06.788 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:25:07.052 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.264 seconds (success: True)
+2025-10-19 02:25:07.052 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:25:36.790 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:25:36.790 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:25:36.910 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.120 seconds (success: True)
+2025-10-19 02:25:36.911 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:26:06.807 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:26:06.807 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:26:06.945 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.138 seconds (success: True)
+2025-10-19 02:26:06.945 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:26:36.813 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:26:36.813 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:26:36.941 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.128 seconds (success: True)
+2025-10-19 02:26:36.941 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:27:06.815 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:27:06.816 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:27:07.000 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.185 seconds (success: True)
+2025-10-19 02:27:07.001 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'
+2025-10-19 02:27:36.819 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] async_get_token called
+2025-10-19 02:27:36.819 DEBUG (MainThread) [custom_components.nsw_fuel_ui.api] Requesting https://api.onegov.nsw.gov.au/FuelPriceCheck/v2/fuel/prices/station/18798 with headers={'Authorization': 'Bearer 3QTq1F...PtsO', 'Accept': 'application/json'}
+2025-10-19 02:27:36.983 DEBUG (MainThread) [custom_components.nsw_fuel_ui.coordinator] Finished fetching nsw_fuel_18798 data in 0.164 seconds (success: True)
+2025-10-19 02:27:36.983 ERROR (MainThread) [homeassistant] Error doing job: Task exception was never retrieved (None)
+Traceback (most recent call last):
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity_platform.py", line 1056, in _async_update_entity_states
+    await entity.async_update_ha_state(True)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 978, in async_update_ha_state
+    self._async_write_ha_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1148, in _async_write_ha_state
+    self.__async_calculate_state()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1085, in __async_calculate_state
+    state = self._stringify_state(available)
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/helpers/entity.py", line 1029, in _stringify_state
+    if (state := self.state) is None:
+                 ^^^^^^^^^^
+  File "/home/vscode/.local/lib/python3.13/site-packages/homeassistant/components/sensor/__init__.py", line 520, in state
+    value = self.native_value
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/nsw_fuel_ui/config/custom_components/nsw_fuel_ui/sensor.py", line 39, in native_value
+    return data["price"] if data else None
+           ~~~~^^^^^^^^^
+KeyError: 'price'

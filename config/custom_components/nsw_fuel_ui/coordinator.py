@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta,timezone
-from typing import Any
+from datetime import UTC, datetime, timedelta
+from typing import TYPE_CHECKING, Any
 
-from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .api import NSWFuelApiClientAuthError,NSWFuelApiClientError
+from .api import NSWFuelApiClientAuthError, NSWFuelApiClientError
 from .const import REF_DATA_REFRESH_DAYS
+
+if TYPE_CHECKING:
+    from homeassistant.core import HomeAssistant
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,7 +31,7 @@ class NSWFuelCoordinator(DataUpdateCoordinator):
         )
         self.api = api
         self.station_code = station_code
-        self._last_ref_update = datetime.min.replace(tzinfo=timezone.UTC)
+        self._last_ref_update = datetime(1, 1, 1, tzinfo=UTC)
         self._reference_data = None
 
     def _needs_ref_update(self, now: datetime) -> bool:
@@ -39,7 +41,7 @@ class NSWFuelCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> dict[str, Any]:
         try:
-            now = datetime.now(timezone.UTC)
+            now = datetime.now(UTC)
             # Refresh reference data monthly or alternaitve
             if self._needs_ref_update(now):
                 self._reference_data = await self.api.async_get_reference_data()

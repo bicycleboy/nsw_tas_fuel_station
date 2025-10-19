@@ -7,22 +7,25 @@ git@github.com:bicycleboy/nsw_fuel_ui.git
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
 from homeassistant.const import Platform
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import NSWFuelApiClient
-from .coordinator import NSWFuelCoordinator
 from .const import DOMAIN
+from .coordinator import NSWFuelCoordinator
 
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+
+_LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
-
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -33,6 +36,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         client_id=entry.data["client_id"],
         client_secret=entry.data["client_secret"],
     )
+    _LOGGER.debug("NSWFuelApiClient created")
 
     station_code = entry.data["station_code"]
     coordinator = NSWFuelCoordinator(hass, api, station_code)
@@ -42,6 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
+
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Handle removal of an entry."""
