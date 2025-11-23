@@ -9,9 +9,9 @@ from __future__ import annotations
 
 import datetime
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from homeassistant.const import Platform
+from homeassistant.const import Platform, CONF_CLIENT_ID, CONF_CLIENT_SECRET
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from nsw_fuel import NSWFuelApiClient
 
@@ -25,23 +25,31 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.SENSOR]
 
-if TYPE_CHECKING:
-    from homeassistant.core import HomeAssistant
-
 DEFAULT_SCAN_INTERVAL = datetime.timedelta(minutes=60)
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up this integration using UI."""
+
     session = async_get_clientsession(hass)
     api = NSWFuelApiClient(
         session=session,
-        client_id=entry.data["client_id"],
-        client_secret=entry.data["client_secret"],
+        client_id=entry.data[CONF_CLIENT_ID],
+        client_secret=entry.data[CONF_CLIENT_SECRET],
     )
     _LOGGER.debug("NSWFuelApiClient created")
 
-    station_code = entry.data["station_code"]
-    coordinator = NSWFuelCoordinator(hass, api, station_code)
+    selected_stations: list[int] = entry.data.get("selected_station_codes", [])
+    station_info: dict[int, dict[str, Any]] = entry.data.get("station_info", {})
+
+    coordinator = NSWFuelCoordinator(
+        hass=hass,
+        api=api,
+        stations=selected_stations,
+        station_info=station_info,
+        scan_interval=DEFAULT_SCAN_INTERVAL,
+    )
+
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
