@@ -10,6 +10,18 @@ Home Assistant Integration for the NSW Government Fuel Check API
 - Sensors for favorite fuel station(s)
 - Sensors for cheapest fuel near location
 
+## Repository Overview
+This repository contains:
+
+File | Purpose | Documentation
+-- | -- | --
+`.github/ISSUE_TEMPLATE/*.yml` | Templates for the issue tracker | [Documentation](https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository)
+`custom_components/*.py` | Integration files, this is where everything happens. |
+`LICENSE` | The license file for the project. | [Documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/licensing-a-repository)
+`pyproject.toml` | Python setup and configuration for this integration. | [Documentation](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/)
+`tests/*.py` | Unit test files for each .py file without calling any real APIs. |
+`README.md` | The file you are reading now. | [Documentation](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax)
+
 
 ## Installation
 TBC: Prior to release git clone to the home assistant config/custom_components directory.
