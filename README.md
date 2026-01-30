@@ -24,7 +24,10 @@ File | Purpose | Documentation
 
 
 ## Installation
-TBC: Prior to release git clone to the home assistant config/custom_components directory.
+Prior to release git clone to the home assistant config/custom_components directory:
+cd /tmp
+git clone https://github.com/bicycleboy/nsw_fuel_station.git
+mv nsw_fuel_station/custom_components/nsw_fuel_station <config directory>/custom_components
 
 ## Contributing
 Contributions and feedback welcome, please visit https://github.com/bicycleboy/nsw_fuel_ui, select **Issues** and choose either bug report or feature request.
