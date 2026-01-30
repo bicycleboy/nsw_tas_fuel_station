@@ -1,5 +1,5 @@
 ---
-name: "Bug report"
+name: "NSW Fuel Check Integration Bug report"
 description: "Report a bug with the integration"
 body:
 - type: markdown

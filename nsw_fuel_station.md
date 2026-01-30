@@ -5,10 +5,10 @@ ha_release: 2026.5
 ha_iot_class: Cloud Polling
 ha_codeowners:
   - '@bicycleboy'
-ha_domain: nsw_fuel_ui
+ha_domain: nsw_fuel_station
 ha_integration_type: hub
 related:
-  - url: https://github.com/bicycleboy/nsw_fuel_ui
+  - url: https://github.com/bicycleboy/nsw_fuel_station
     title: Integration Source
   - url: https://https://github.com/bicycleboy/nsw-fuel-api-client
     title: API Client Source

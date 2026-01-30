@@ -7,7 +7,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from custom_components.nsw_fuel_ui.const import DOMAIN
+from custom_components.nsw_fuel_station.const import DOMAIN
 from nsw_fuel.dto import Price, Station, StationPrice
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 # Add "nsw-fuel-api-cient == 2.0.0.b2" for production deployment
 #
 [project]
-name = "nsw_fuel_ui"
+name = "nsw_fuel_station"
 version = "2.0.0b1"
 readme = "README.md"
 description = "Home Assistant Integration for NSW Fuel Check API"
@@ -27,7 +27,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/nickw444/nsw-fuel-api-client"
+Homepage = "https://github.com/bicycleboy/nsw_fuel_station"
 
 [project.optional-dependencies]
 test = [
@@ -43,7 +43,7 @@ test = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["nsw_fuel_ui"]
+include = ["nsw_fuel_station"]
 
 [tool.pytest.ini_options]
 # Automatically discover tests inside these paths

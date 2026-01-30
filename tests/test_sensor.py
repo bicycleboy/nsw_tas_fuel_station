@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from custom_components.nsw_fuel_ui.const import DOMAIN
-from custom_components.nsw_fuel_ui.coordinator import NSWFuelCoordinator
-from custom_components.nsw_fuel_ui.sensor import (
+from custom_components.nsw_fuel_station.const import DOMAIN
+from custom_components.nsw_fuel_station.coordinator import NSWFuelCoordinator
+from custom_components.nsw_fuel_station.sensor import (
     CheapestFuelPriceSensor,
     FuelPriceSensor,
     _attribution_for_state,

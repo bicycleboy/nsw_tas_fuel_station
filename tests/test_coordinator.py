@@ -6,11 +6,11 @@ from datetime import timedelta
 from unittest.mock import AsyncMock
 
 import pytest
-from custom_components.nsw_fuel_ui.const import (
+from custom_components.nsw_fuel_station.const import (
     DEFAULT_FUEL_TYPE,
     E10_AVAILABLE_STATES,
 )
-from custom_components.nsw_fuel_ui.coordinator import NSWFuelCoordinator
+from custom_components.nsw_fuel_station.coordinator import NSWFuelCoordinator
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed
 from nsw_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
