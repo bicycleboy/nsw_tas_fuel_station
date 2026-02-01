@@ -24,6 +24,7 @@ class NSWFuelData:
     coordinator: NSWFuelCoordinator
     integration: Integration
 
+
 StationKey = tuple[int, str]
 """
 Uniquely identifies a fuel station, station codes not unique across states.

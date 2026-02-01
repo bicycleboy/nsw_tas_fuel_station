@@ -80,6 +80,7 @@ FUEL_PRICES = {
 def auto_enable_custom_integrations(enable_custom_integrations) -> None:
     yield
 
+
 @pytest.fixture(name="mock_api_client")
 def mock_api_client_fixture():
     """Return a mock of the NSWFuelApi client."""
@@ -88,9 +89,8 @@ def mock_api_client_fixture():
     client.authenticate = AsyncMock(return_value=True)
 
     async def _get_stations_near_location(
-        latitude: float,
-        longitude: float,
-        radius: int = 25):
+        latitude: float, longitude: float, radius: int = 25
+    ):
         if latitude < -40:
             return STATIONS_TAS
         return STATIONS_NSW
@@ -99,9 +99,7 @@ def mock_api_client_fixture():
         side_effect=_get_stations_near_location
     )
 
-    async def _get_fuel_prices_for_station(
-            station_code: str,
-            au_state: str = "NSW"):
+    async def _get_fuel_prices_for_station(station_code: str, au_state: str = "NSW"):
         """Return List[Price] (favorites path)."""
         station_code = int(station_code)
         station_prices = FUEL_PRICES.get(station_code, {})
@@ -143,9 +141,7 @@ def mock_api_client_fixture():
                     address="Test Address",
                     latitude=latitude,
                     longitude=longitude,
-                    au_state=station_data[
-                        "au_state"
-                    ],
+                    au_state=station_data["au_state"],
                 )
 
                 price = Price(

@@ -23,6 +23,7 @@ from custom_components.nsw_fuel_station.sensor import (
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
 
+
 @pytest.fixture
 def nicknames_home_only() -> dict:
     """Single NSW nickname with location and favorites."""
@@ -43,9 +44,7 @@ def nicknames_home_only() -> dict:
 
 @pytest.fixture
 async def coordinator(
-    hass: HomeAssistant,
-    mock_api_client,
-    nicknames_home_only
+    hass: HomeAssistant, mock_api_client, nicknames_home_only
 ) -> NSWFuelCoordinator:
     """Initialise coordinator with data loaded."""
     coord = NSWFuelCoordinator(

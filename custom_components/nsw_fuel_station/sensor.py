@@ -152,7 +152,6 @@ class CheapestFuelPriceSensor(CoordinatorEntity[NSWFuelCoordinator], SensorEntit
             self._attr_unique_id,
         )
 
-
     @property
     def device_info(self) -> DeviceInfo:
         """Device/Service/Location information."""
@@ -228,9 +227,11 @@ def create_favorite_station_sensors(
                 )
                 continue
 
-            _LOGGER.debug("Creating favorite sensors for station %s (%s)",
-                          station_name,
-                          station_code)
+            _LOGGER.debug(
+                "Creating favorite sensors for station %s (%s)",
+                station_name,
+                station_code,
+            )
 
             sensors.extend(
                 FuelPriceSensor(
@@ -273,8 +274,8 @@ def create_cheapest_fuel_sensors(
                     coordinator=coordinator,
                     nickname=nickname,
                     rank=rank,
-                    au_state=au_state)
-
+                    au_state=au_state,
+                )
             )
 
     return sensors

@@ -63,7 +63,6 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
         self._nickname_locations = self._extract_nickname_locations(nicknames)
 
-
     async def _async_update_data(self) -> CoordinatorData:
         """Fetch updated fuel prices for all configured stations."""
         try:
@@ -85,7 +84,6 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
             "cheapest": cheapest,
         }
 
-
     async def _update_favorite_stations(self) -> dict[StationKey, dict[str, Price]]:
         """
             Fetch prices for user's favorite stations.
@@ -105,7 +103,6 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
         favorites: dict[StationKey, dict[str, Price]] = {}
 
         for station_code, au_state in self._station_keys:
-
             prices: list[Price] = await self.api.get_fuel_prices_for_station(
                 str(station_code),
                 au_state,
@@ -116,7 +113,6 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
             }
 
         return favorites
-
 
     async def _update_cheapest_stations(self) -> dict[str, list[dict]]:
         """
@@ -143,7 +139,6 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
         cheapest: dict[str, list[dict]] = {}
 
         for nickname, (lat, lon) in self._nickname_locations.items():
-
             # U91 most reliable/sensible results
             default_nearby = await self.api.get_fuel_prices_within_radius(
                 latitude=lat,
@@ -194,7 +189,6 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
         return cheapest
 
-
     def _extract_nickname_locations(
         self,
         nicknames: dict[str, dict[str, Any]],
@@ -218,15 +212,11 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
             if lat is None or lon is None:
                 msg = f"Nickname '{nickname}' must include latitude and longitude"
-                raise ValueError(
-                    msg
-                )
+                raise ValueError(msg)
 
             if not isinstance(lat, (int, float)) or not isinstance(lon, (int, float)):
                 msg = f"Latitude/longitude for nickname '{nickname}' must be numeric"
-                raise TypeError(
-                    msg
-                )
+                raise TypeError(msg)
 
             locations[nickname] = (float(lat), float(lon))
 
@@ -235,7 +225,6 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
             raise ValueError(msg)
 
         return locations
-
 
     @property
     def nicknames(self) -> list[str]:

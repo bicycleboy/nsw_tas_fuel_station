@@ -107,7 +107,6 @@ async def test_update_cheapest_stations_e10_u91(
     # U91: 170, 165
     # E10: 168, 160  -> should win overall cheapest
     async def fake_within_radius(latitude, longitude, radius=25, fuel_type=None):
-
         station = Station(
             ident=None,
             brand="Test",
@@ -311,4 +310,3 @@ def test_nicknames_property(coordinator: NSWFuelCoordinator) -> None:
     names = coordinator.nicknames
 
     assert names == ["Home"]
-
