@@ -57,6 +57,9 @@ markers = [
 # Use a verbose output and colored diff for readability
 addopts = "-v --tb=short --color=yes"
 
+[tool.ruff]
+target-version = "py312"
+
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = [
     "ANN001",
