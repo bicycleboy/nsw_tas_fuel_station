@@ -54,7 +54,7 @@ class FuelPriceSensor(CoordinatorEntity[NSWFuelCoordinator], SensorEntity):
     _attr_device_class = SensorDeviceClass.MONETARY
     _attr_has_entity_name = True
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         coordinator: NSWFuelCoordinator,
         nickname: str,
@@ -182,8 +182,7 @@ class CheapestFuelPriceSensor(CoordinatorEntity[NSWFuelCoordinator], SensorEntit
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
-        """
-        Add attributes for display in the user interface.
+        """Add attributes for display in the user interface.
 
         Station name and fuel type are dynamic (as well as sensor value/price).
         User needs a way of identifying which fuel station this sensor refers to.
@@ -251,8 +250,7 @@ def create_favorite_station_sensors(
 def create_cheapest_fuel_sensors(
     coordinator: NSWFuelCoordinator,
 ) -> list[CheapestFuelPriceSensor]:
-    """
-    Create CheapestFuelPriceSensor entities for all nicknames.
+    """Create CheapestFuelPriceSensor entities for all nicknames.
 
     Always create 2 sensors per nickname for rank 1 and 2.
     """
