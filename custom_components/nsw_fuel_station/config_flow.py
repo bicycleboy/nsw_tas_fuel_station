@@ -137,7 +137,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors=errors,
             )
 
-        # Store metadata to save coordinator additoinal api calls
+        # Store metadata to save coordinator additional api calls
         nicknames = self._flow_data.setdefault("nicknames", {})
         nickname_data = nicknames.setdefault(nickname, {})
         nickname_data["location"] = {"latitude": lat, "longitude": lon}
@@ -265,7 +265,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         - allow the user to create a new nickname to group stations.
         - support the creation of "cheapest near ..." sensors.
         - allow the user to add stations to an existing location.
-        - allow the user to add additonal fuel types to existing stations
+        - allow the user to add additional fuel types to existing stations
         """
         errors: dict[str, str] = {}
 

@@ -2,13 +2,13 @@
 
 from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 from nsw_tas_fuel.dto import Price, Station, StationPrice
-from pytest_homeassistant_custom_component.common import (
-    MockConfigEntry,
-)
+import pytest
 
 from custom_components.nsw_fuel_station.const import DOMAIN
+#from homeassistant.components.nsw_fuel_station.const import DOMAIN
+
+from tests.common import MockConfigEntry
 
 LATITUDE = -35.28
 LONGITUDE = 149.13
@@ -22,7 +22,7 @@ STATION_NSW_C = 444
 STATION_TAS_D = 333
 STATION_TAS_E = 555
 CLIENT_ID = "test_client_id"
-CLIENT_SECRET = "test_client_secret"  # noqa: S105
+CLIENT_SECRET = "test_client_secret"
 
 STATIONS_NSW = [
     {
@@ -77,8 +77,9 @@ FUEL_PRICES = {
 
 
 @pytest.fixture(autouse=True)
-def auto_enable_custom_integrations(enable_custom_integrations) -> None:
-    yield
+def auto_enable_custom_integrations(enable_custom_integrations: None) -> None:
+    """Automatically enable custom integrations for all tests."""
+    return
 
 
 @pytest.fixture(name="mock_api_client")

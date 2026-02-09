@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = [Platform.SENSOR]
-# Stations apppear to update at random, it could be days between price changes
+# Stations appear to update at random, it could be days between price changes
 DEFAULT_SCAN_INTERVAL = datetime.timedelta(minutes=720)
 
 

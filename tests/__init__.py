@@ -1,1 +1,1 @@
-"""Test Init for NSW Fule Check Intergration."""
+"""Test Init for NSW Fuel Check Integration."""

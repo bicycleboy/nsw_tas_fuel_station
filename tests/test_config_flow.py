@@ -2,15 +2,16 @@
 
 from unittest.mock import AsyncMock, patch
 
+from nsw_tas_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
 import pytest
+
 from homeassistant import config_entries
+
+from custom_components.nsw_fuel_station.const import DOMAIN
+#from homeassistant.components.nsw_fuel_station.const import DOMAIN
 from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from nsw_tas_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
-from pytest_homeassistant_custom_component.common import MockConfigEntry
-
-from custom_components.nsw_fuel_station.const import DOMAIN
 
 from .conftest import (
     CLIENT_ID,
@@ -24,6 +25,12 @@ from .conftest import (
     STATION_NSW_C,
     STATION_TAS_D,
     STATION_TAS_E,
+)
+
+from tests.common import MockConfigEntry
+
+NSW_FUEL_API_DEFINITION = (
+    "homeassistant.components.nsw_fuel_station.config_flow.NSWFuelApiClient"
 )
 
 
@@ -53,7 +60,7 @@ async def test_successful_config_flow(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -126,7 +133,7 @@ async def test_no_station_selected_error(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -182,7 +189,7 @@ async def test_no_available_stations_abort(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -236,7 +243,7 @@ async def test_add_station_to_existing_nickname(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -284,7 +291,7 @@ async def test_invalid_credentials(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=bad_client,
         ),
     ):
@@ -319,7 +326,7 @@ async def test_timeout_error_on_station_fetch(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=timeout_client,
         ),
     ):
@@ -369,7 +376,7 @@ async def test_api_connection_errors_on_station_fetch(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=error_client,
         ),
     ):
@@ -399,7 +406,7 @@ async def test_invalid_location_goes_to_advanced(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_client,
         ),
     ):
@@ -429,7 +436,7 @@ async def test_invalid_location_in_advanced_options(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -484,7 +491,7 @@ async def test_invalid_nickname_in_advanced_options(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -595,7 +602,7 @@ async def test_add_fuel_type_to_existing_station_via_advanced(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -667,7 +674,7 @@ async def test_add_multiple_nicknames(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -803,7 +810,7 @@ async def test_duplicate_fuel_type_in_advanced_path(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
@@ -863,7 +870,7 @@ async def test_location_outside_nsw_tas_bounds(
     with (
         patch.dict("os.environ", mock_env),
         patch(
-            "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient",
+            NSW_FUEL_API_DEFINITION,
             return_value=mock_api_client,
         ),
     ):
