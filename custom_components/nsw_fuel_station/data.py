@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.loader import Integration
-    from nsw_fuel import NSWFuelApiClient
+    from nsw_tas_fuel import NSWFuelApiClient
 
     from .coordinator import NSWFuelCoordinator
 

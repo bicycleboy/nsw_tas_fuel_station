@@ -7,9 +7,7 @@
   "config_flow": true,
   "documentation": "git@github.com:bicycleboy/nsw_fuel_station.git",
   "iot_class": "cloud_polling",
-  "issue_tracker": "git@github.com:bicycleboy/nsw_fuel_station.git/issues",
-  "version": "2.0.0b2",
-  "integration_type": "service",
+  "version": "0.0.1",
   "requirements": [
     "aiohttp>=3.9.0"
   ],

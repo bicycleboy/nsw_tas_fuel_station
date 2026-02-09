@@ -3,7 +3,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from nsw_fuel.dto import Price, Station, StationPrice
+from nsw_tas_fuel.dto import Price, Station, StationPrice
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
 )

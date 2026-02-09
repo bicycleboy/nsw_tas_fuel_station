@@ -25,7 +25,7 @@ from homeassistant.helpers.selector import (
 )
 from homeassistant.helpers.translation import async_get_translations
 from homeassistant.util import slugify
-from nsw_fuel import (
+from nsw_tas_fuel import (
     NSWFuelApiClient,
     NSWFuelApiClientAuthError,
     NSWFuelApiClientError,
@@ -52,7 +52,7 @@ from .const import (
 
 if TYPE_CHECKING:
     from homeassistant import config_entries
-    from nsw_fuel.client import StationPrice
+    from nsw_tas_fuel.client import StationPrice
 
 _LOGGER = logging.getLogger(__name__)
 

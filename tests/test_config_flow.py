@@ -7,7 +7,7 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from nsw_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
+from nsw_tas_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.nsw_fuel_station.const import DOMAIN

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 from custom_components.nsw_fuel_station.const import DOMAIN
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from nsw_fuel import (
+from nsw_tas_fuel import (
     NSWFuelApiClient,
     NSWFuelApiClientAuthError,
     NSWFuelApiClientError,

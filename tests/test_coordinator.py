@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock
 import pytest
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed
-from nsw_fuel import (
+from nsw_tas_fuel import (
     NSWFuelApiClientAuthError,
     NSWFuelApiClientError,
     Price,
