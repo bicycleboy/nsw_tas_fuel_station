@@ -7,11 +7,17 @@ import os
 import re
 from typing import TYPE_CHECKING, Any
 
-import homeassistant.helpers.config_validation as cv
+from nsw_tas_fuel import (
+    NSWFuelApiClient,
+    NSWFuelApiClientAuthError,
+    NSWFuelApiClientError,
+)
 import voluptuous as vol
+
 from homeassistant.config_entries import ConfigFlow
 from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.selector import (
     LocationSelector,
     LocationSelectorConfig,
@@ -25,11 +31,6 @@ from homeassistant.helpers.selector import (
 )
 from homeassistant.helpers.translation import async_get_translations
 from homeassistant.util import slugify
-from nsw_tas_fuel import (
-    NSWFuelApiClient,
-    NSWFuelApiClientAuthError,
-    NSWFuelApiClientError,
-)
 
 from .const import (
     ALL_FUEL_TYPES,
@@ -51,15 +52,15 @@ from .const import (
 )
 
 if TYPE_CHECKING:
-    from homeassistant import config_entries
     from nsw_tas_fuel.client import StationPrice
+
+    from homeassistant import config_entries
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
-    """
-    Config flow for NSW Fuel Check Integration.
+    """Config flow for NSW Fuel Check Integration.
 
     Config flow uses nicknames as logical grouping (ie "home", "work", "trip to work")
     to support "cheapest near ..." sensors but also to give user more options in UI
@@ -73,12 +74,12 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         self._last_form: dict[str, Any] | None = None
         self._nearby_station_prices: list[StationPrice] = []
         self._station_lookup: dict[int, dict[str, Any]] = {}
+        self.api: NSWFuelApiClient | None = None
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """
-        Step 1 - Prompt for API credentials.
+        """Step 1 - Prompt for API credentials.
 
         API call get_fuel_prices_within_radius both validates credentials and gathers
         list of stations for step 2.
@@ -156,8 +157,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_station_select(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """
-        Step 2 - allow user to select stations for a nickname/location.
+        """Step 2 - allow user to select stations for a nickname/location.
 
         This step entered either via default path or via advanced options.
         Build or update a config entry for selected stations with
@@ -258,8 +258,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_advanced_options(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """
-        Step 3 - optional advanced configuration.
+        """Step 3 - optional advanced configuration.
 
         - allow the user to enter non-default nickname, fuel, location.
         - allow the user to create a new nickname to group stations.
@@ -342,8 +341,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         selected_codes: list[int],
         selected_fuel: str,
     ) -> config_entries.ConfigFlowResult:
-        """
-        Create a config entry for a new nickname.
+        """Create a config entry for a new nickname.
 
         Store metadata from API to save coordinator additional API calls.
         In the default path, hardcode fuel types E10, U91
@@ -389,8 +387,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         selected_fuel: str,
         available_stations: list[StationPrice],
     ) -> config_entries.ConfigFlowResult:
-        """
-        Merge user selection with existing config entry.
+        """Merge user selection with existing config entry.
 
         Allows user to add stations to an existing nickname/location
         or add additional fuel types to existing station.
@@ -633,8 +630,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         lon: float,
         fuel_type: str,
     ) -> dict[str, str]:
-        """
-        Return a list of nearby stations.
+        """Return a list of nearby stations.
 
         The API appears to balance price/distance regardless of
         the sort by setting.
@@ -687,8 +683,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 def _format_station_option(sp: StationPrice) -> str:
-    """
-    Return a user-friendly station label for the UI.
+    """Return a user-friendly station label for the UI.
 
     TODO: Some long addresses are treated unkindly by the selector/UI
     """
@@ -700,8 +695,7 @@ def _add_e10_to_u91_if_available(
     au_state: str,
     selected_fuel: str,
 ) -> list[str]:
-    """
-    Automatically add an e10 sensor if e10 widely available.
+    """Automatically add an e10 sensor if e10 widely available.
 
     Searching nearest with U91 most reliable, particualry in TAS.
     Hardcode adding e10 to avoid additional API lookup since e10
