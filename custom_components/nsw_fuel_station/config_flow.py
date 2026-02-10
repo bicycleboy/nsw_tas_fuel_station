@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import re
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from nsw_tas_fuel import (
     NSWFuelApiClient,
@@ -16,6 +16,7 @@ import voluptuous as vol
 
 from homeassistant.config_entries import ConfigFlow
 from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.selector import (
@@ -114,6 +115,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             client_id=self._flow_data[CONF_CLIENT_ID],
             client_secret=self._flow_data[CONF_CLIENT_SECRET],
         )
+
         self.api = api
 
         location = self._flow_data.get(CONF_LOCATION)
@@ -383,7 +385,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         self,
         updating_entry: config_entries.ConfigEntry,
         nickname: str,
-        selected_codes: list[int],
+        selected_station_codes: list[int],
         selected_fuel: str,
         available_stations: list[StationPrice],
     ) -> config_entries.ConfigFlowResult:
@@ -404,11 +406,15 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 existing_sensors.add((st["station_code"], st["au_state"], ft))
 
         # In advanced path duplicates are possible, so alert user to existing sensor
-        for code in selected_codes:
-            st_lookup = self._station_lookup[code]
-            key = (code, st_lookup["au_state"], selected_fuel)
+        for selected_station_code in selected_station_codes:
+            station_lookup = self._station_lookup[selected_station_code]
+            sensor_key = (
+                selected_station_code,
+                station_lookup["au_state"],
+                selected_fuel,
+            )
 
-            if key in existing_sensors:
+            if sensor_key in existing_sensors:
                 return self.async_show_form(
                     step_id="station_select",
                     data_schema=self._build_station_schema(
@@ -418,32 +424,33 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                     ),
                     errors={"base": "sensor_exists"},
                     description_placeholders={
-                        "station": st_lookup["station_name"],
+                        "station": station_lookup["station_name"],
                         "fuel": selected_fuel,
                     },
                 )
 
-        def station_key(st: dict[str, Any]) -> tuple[int, str]:
-            return (st["station_code"], st["au_state"])
-
-        merged_stations_map = {station_key(st): dict(st) for st in existing_stations}
+        merged_stations_map: dict[tuple[int, str], dict[str, Any]] = {
+            (st["station_code"], st["au_state"]): dict(st) for st in existing_stations
+        }
 
         # merge station to nickname or additional fuel to station
-        for code in selected_codes:
-            st_lookup = self._station_lookup[code]
-            key = (code, st_lookup["au_state"])
+        for selected_station_code in selected_station_codes:
+            station_lookup = self._station_lookup[selected_station_code]
+            station_state_key = (selected_station_code, station_lookup["au_state"])
 
-            if key in merged_stations_map:
-                fuels = set(merged_stations_map[key].get("fuel_types", []))
+            if station_state_key in merged_stations_map:
+                fuels = set(
+                    merged_stations_map[station_state_key].get("fuel_types", [])
+                )
                 fuels.add(selected_fuel)
-                merged_stations_map[key]["fuel_types"] = sorted(fuels)
+                merged_stations_map[station_state_key]["fuel_types"] = sorted(fuels)
             else:
-                merged_stations_map[key] = {
-                    "station_code": code,
-                    "au_state": st_lookup["au_state"],
-                    "station_name": st_lookup["station_name"],
+                merged_stations_map[station_state_key] = {
+                    "station_code": selected_station_code,
+                    "au_state": station_lookup["au_state"],
+                    "station_name": station_lookup["station_name"],
                     "fuel_types": _add_e10_to_u91_if_available(
-                        st_lookup["au_state"], selected_fuel
+                        station_lookup["au_state"], selected_fuel
                     ),
                 }
 
@@ -509,12 +516,15 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         # In absence of "advanced options" button, add "Find more stations..." to list
         options: list[SelectOptionDict] = [
-            {"value": "__advanced__", "label": advanced_label},
+            cast(SelectOptionDict, {"value": "__advanced__", "label": advanced_label}),
             *[
-                {
-                    "value": str(sp.station.code),
-                    "label": _format_station_option(sp),
-                }
+                cast(
+                    SelectOptionDict,
+                    {
+                        "value": str(sp.station.code),
+                        "label": _format_station_option(sp),
+                    },
+                )
                 for sp in stations
             ],
         ]
@@ -642,6 +652,9 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             _LOGGER.debug(
                 "Fetching stations near %s,%s for fuel type=%s", lat, lon, fuel_type
             )
+
+            if not self.api:
+                raise HomeAssistantError("API client not initialized")
 
             nearby = await self.api.get_fuel_prices_within_radius(
                 latitude=lat,

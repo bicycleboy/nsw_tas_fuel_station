@@ -5,8 +5,6 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.exceptions import ConfigEntryAuthFailed
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from nsw_tas_fuel import (
     NSWFuelApiClient,
     NSWFuelApiClientAuthError,
@@ -39,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
     """Manages updates from NSW Fuel Check API."""
 
-    data: CoordinatorData | None
+    data: CoordinatorData
 
     def __init__(
         self,

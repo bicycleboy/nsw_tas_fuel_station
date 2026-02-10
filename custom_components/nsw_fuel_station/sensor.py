@@ -15,7 +15,7 @@ from .coordinator import NSWFuelCoordinator
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
-    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+    from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
     from .data import NSWFuelConfigEntry
 
@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: NSWFuelConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+    async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up sensors for NSW Fuel Check from a config entry."""
     coordinator: NSWFuelCoordinator = hass.data[DOMAIN][config_entry.entry_id]
