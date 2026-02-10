@@ -9,20 +9,10 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from custom_components.nsw_fuel_station.const import DOMAIN
-# from homeassistant.components.nsw_fuel_station.const import DOMAIN
 
 from custom_components.nsw_fuel_station.coordinator import NSWFuelCoordinator
-# from homeassistant.components.nsw_fuel_station.coordinator import NSWFuelCoordinator
 
-# from custom_components.nsw_fuel_station.sensor import (
-#    CheapestFuelPriceSensor,
-#    FuelPriceSensor,
-#    _attribution_for_state,
-#    async_setup_entry,
-#    create_cheapest_fuel_sensors,
-#    create_favorite_station_sensors,
-# )
-from homeassistant.components.nsw_fuel_station.sensor import (
+from custom_components.nsw_fuel_station.sensor import (
     CheapestFuelPriceSensor,
     FuelPriceSensor,
     _attribution_for_state,

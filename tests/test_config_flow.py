@@ -8,7 +8,7 @@ import pytest
 from homeassistant import config_entries
 
 from custom_components.nsw_fuel_station.const import DOMAIN
-#from homeassistant.components.nsw_fuel_station.const import DOMAIN
+
 from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
@@ -30,7 +30,7 @@ from .conftest import (
 from tests.common import MockConfigEntry
 
 NSW_FUEL_API_DEFINITION = (
-    "homeassistant.components.nsw_fuel_station.config_flow.NSWFuelApiClient"
+    "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient"
 )
 
 

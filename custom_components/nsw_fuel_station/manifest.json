@@ -5,7 +5,8 @@
     "@bicycleboy"
   ],
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/nsw_fuel_station",
+  "documentation": "https://github.com/bicycleboy/nsw_tas_fuel_station",
   "iot_class": "cloud_polling",
-  "requirements": []
+  "requirements": [],
+  "version": "0.1.0"
 }
