@@ -16,7 +16,7 @@
         "description": "Select your favorite stations then **Submit**. You can select multiple stations before **Submit**.\n\n\nSelect \"**Find more stations...**\" (only) then **Submit** for advanced options to return here with different station choices.",
         "data": {
           "selected_station_codes": "Click to select your favorite stations",
-          "advanced_option": " Find more stations..."
+          "advanced_option": "Find more stations..."
         }
       },
       "advanced_options": {
