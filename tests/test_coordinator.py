@@ -15,9 +15,7 @@ from nsw_tas_fuel import (
 import pytest
 
 from custom_components.nsw_fuel_station.const import DEFAULT_FUEL_TYPE
-
 from custom_components.nsw_fuel_station.coordinator import NSWFuelCoordinator
-
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed

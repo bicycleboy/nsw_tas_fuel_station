@@ -37,7 +37,7 @@ _LOGGER = logging.getLogger(__name__)
 class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
     """Manages updates from NSW Fuel Check API."""
 
-    data: CoordinatorData | None
+    data: CoordinatorData
 
     def __init__(
         self,
