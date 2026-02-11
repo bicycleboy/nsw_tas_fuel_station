@@ -13,7 +13,7 @@
       },
       "station_select": {
         "title": "Select Stations",
-        "description": "Select your favorite stations then **Submit**. You can select multiple stations before **Submit**.\n\n\nSelect \"**Find more stations**\" then **Submit** for advanced options to return here with different station choices.",
+        "description": "Select your favorite stations then **Submit**. You can select multiple stations before **Submit**.\n\n\nSelect \"**Find more stations...**\" (only) then **Submit** for advanced options to return here with different station choices.",
         "data": {
           "selected_station_codes": "Click to select your favorite stations",
           "advanced_option": " Find more stations..."
@@ -21,7 +21,7 @@
       },
       "advanced_options": {
         "title": "Advanced Selection",
-        "description": "Accept the \"Home\" location nickname or choose new name such as \"Work\" to group fuel stations by location.\n\nYou can create multiple locations by using \"Add Service\" and choosing a new nickname. To add stations to an existing location, just enter the location nickname. To create a trip e.g. \"Trip to work\" use the same nickname and multiple locations.",
+        "description": "Accept the \"Home\" location nickname or choose new name such as \"Work\" to group fuel stations by location.\n\nYou can create multiple locations by using \"Add Entry\" and choosing a new nickname. To add stations to an existing location, just enter the location nickname. To create a trip e.g. \"Trip to work\" use the same nickname and multiple locations.",
         "data": {
           "nickname": "Location nickname",
           "location": "Select a location",
