@@ -16,6 +16,7 @@ rm -rf *.py manifest.json strings.json
 cp $CUSTOM_DIR/*.py .
 cp $CUSTOM_DIR/translations/en.json strings.json
 grep -v "version" $CUSTOM_DIR/manifest.json > manifest.json
+sed -i 's|"domain":.*|"domain": "nsw_fuel_station",|' manifest.json
 sed -i 's|"documentation": *"[^"]*"|"documentation": "https://www.home-assistant.io/integrations/nsw_fuel_station"|' manifest.json
 sed -i 's|"requirements":[[:space:]]*\[[^]]*\]|"requirements": ["nsw-tas-fuel-api-client==0.0.1"]|' manifest.json
 
@@ -24,6 +25,6 @@ cd $CORE_TEST_DIR
 rm -f *.py
 cp $CUSTOM_TEST_DIR/*.py .
 
-sed -i.bak \
+sed \
   's/custom_components\.nsw_fuel_station/homeassistant.components.nsw_fuel_station/g' \
   conftest.py test_config_flow.py test_coordinator.py test_sensor.py
