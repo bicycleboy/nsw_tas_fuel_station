@@ -2,12 +2,10 @@
 requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
-#
-# Add "nsw-fuel-api-cient == 2.0.0.b2" for production deployment
-#
+
 [project]
 name = "nsw_fuel_station"
-version = "2.0.0b1"
+version = "0.0.1"
 readme = "README.md"
 description = "Home Assistant Integration for NSW Fuel Check API"
 authors = [
@@ -17,7 +15,7 @@ license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
     "homeassistant>=2025.12.0",
-    "aiohttp>=3.9"
+    "nsw-fuel-api-cient == 0.0.1"
 ]
 
 classifiers = [
