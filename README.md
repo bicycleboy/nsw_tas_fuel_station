@@ -10,6 +10,12 @@ Home Assistant Integration for the NSW Government Fuel Check API
 - Sensors for favorite fuel station(s)
 - Sensors for cheapest fuel near location
 
+## Example Cards for Your Home Assistant Dashboard
+
+![example cards](./images/example-cards.png)
+
+[yaml](https://github.com/bicycleboy/nsw_tas_fuel_station/example-cards.yaml)
+
 ## Repository Overview
 This repository contains:
 
@@ -28,13 +34,13 @@ Prior to release git clone to the home assistant config/custom_components direct
 
 cd /tmp
 
-git clone https://github.com/bicycleboy/nsw_fuel_station.git
+git clone https://github.com/bicycleboy/nsw_tas_fuel_station.git
 
 mv nsw_fuel_station/custom_components/nsw_fuel_station <config directory>/custom_components
 
 ## Contributing
-Contributions and feedback welcome, please visit https://github.com/bicycleboy/nsw_fuel_ui, select **Issues** and choose either bug report or feature request.
+Contributions and feedback welcome, please visit https://github.com/bicycleboy/nsw_tas_fuel_ui, select **Issues** and choose either bug report or feature request.
 
 ## Licence
-This software is licensed under the MIT License. See the [LICENCE](https://github.com/bicycleboy/nsw_fuel_ui/LICENCE) file for details.
+This software is licensed under the MIT License. See the [LICENCE](https://github.com/bicycleboy/nsw_tas_fuel_ui/LICENCE) file for details.
 
