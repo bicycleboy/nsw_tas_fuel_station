@@ -1,6 +1,6 @@
 --index-url https://pypi.org/simple/
 homeassistant>=2025.2.4
-nsw_fuel==0.0.1
+nsw_tas_fuel==0.0.1
 pytest==9.0.0
 pytest_homeassistant_custom_component==0.13.302
 voluptuous==0.15.2
