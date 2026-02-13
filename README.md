@@ -14,7 +14,7 @@ Home Assistant Integration for the NSW Government Fuel Check API
 
 ![example cards](./images/example-cards.png)
 
-[yaml](https://github.com/bicycleboy/nsw_tas_fuel_station/example-cards.yaml)
+[Example card yaml](https://github.com/bicycleboy/nsw_tas_fuel_station/blob/main/example-cards.yaml)
 
 ## Repository Overview
 This repository contains:
