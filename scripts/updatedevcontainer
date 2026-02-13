@@ -1,0 +1,29 @@
+#!/bin/bash
+
+HOST="magpie.local"
+ROOT_DIR="$HOME/code/ha"
+CONTAINER_DIR="$ROOT_DIR/ha-custom"
+INT_DIR="$ROOT_DIR/nsw_tas_fuel_station"
+CUST=nsw_fuel_station
+CUST_DIR="$INT_DIR/custom_components/$CUST"
+
+set -e
+
+if [ "$(uname -n)" != $HOST ]; then
+    echo "Error: Run from host"
+    exit 1
+fi
+
+cd "$CONTAINER_DIR"
+cp .devcontainer/devcontainer.json /tmp
+sed -i '' '$d' .devcontainer/devcontainer.json
+cat <<EOF >> .devcontainer/devcontainer.json
+,
+  "mounts": [
+    "source=\${localEnv:HOME}/code/ha,target=/workspaces,type=bind,consistency=cached"
+  ]
+}
+EOF
+
+mkdir -p CONTAINER_DIR/custom_components
+ln -s $CUST_DIR $CONTAINER_DIR/custom_components/$CUST
