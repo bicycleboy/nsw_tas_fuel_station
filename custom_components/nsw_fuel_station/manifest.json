@@ -6,5 +6,6 @@
   "documentation": "https://github.com/bicycleboy/nsw_tas_fuel_station",
   "iot_class": "cloud_polling",
   "version": "0.0.1",
+  "issue_tracker": "https://github.com/bicycleboy/nsw_tas_fuel_station/issues",
   "requirements": ["nsw-tas-fuel-api-client==0.0.1"]
 }
