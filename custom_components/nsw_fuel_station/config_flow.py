@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os
 import re
 from typing import TYPE_CHECKING, Any, cast
 
@@ -482,13 +481,8 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         """Build config flow UI schema to get API credentials."""
         user = user_input or self._flow_data
 
-        # to do confirm non-development behaviour
-        if user_input is None:
-            suggested_client_id = os.getenv("NSWFUELCHECKAPI_KEY", "")
-            suggested_client_secret = os.getenv("NSWFUELCHECKAPI_SECRET", "")
-        else:
-            suggested_client_id = user.get(CONF_CLIENT_ID, "")
-            suggested_client_secret = user.get(CONF_CLIENT_SECRET, "")
+        suggested_client_id = user.get(CONF_CLIENT_ID, "")
+        suggested_client_secret = user.get(CONF_CLIENT_SECRET, "")
 
         return vol.Schema(
             {
