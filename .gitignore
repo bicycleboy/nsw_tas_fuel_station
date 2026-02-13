@@ -65,4 +65,4 @@ secrets
 token
 .env
 reference-data.json
-
+*.code-workspace
