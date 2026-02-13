@@ -1,6 +1,6 @@
 """Constants for NSW Fuel Check Integration."""
 
-DOMAIN = "nsw_fuel_station"
+DOMAIN = "nsw_tas_fuel_station"
 ALL_FUEL_TYPES = {
     "E10": "Ethanol 94",
     "U91": "Unleaded 91",

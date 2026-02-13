@@ -20,6 +20,7 @@ sed -i 's|"domain":.*|"domain": "nsw_fuel_station",|' manifest.json
 sed -i 's|"documentation": *"[^"]*"|"documentation": "https://www.home-assistant.io/integrations/nsw_fuel_station"|' manifest.json
 sed -i 's|"requirements":[[:space:]]*\[[^]]*\]|"requirements": ["nsw-tas-fuel-api-client==0.0.1"]|' manifest.json
 
+sed -i 's|DOMAIN.*|DOMAIN = "nsw_fuel_station"|' const.py
 
 cd $CORE_TEST_DIR
 rm -f *.py

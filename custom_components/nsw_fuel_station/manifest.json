@@ -1,12 +1,10 @@
 {
-  "domain": "nsw_fuel_station",
+  "domain": "nsw_tas_fuel_station",
   "name": "NSW Fuel Check",
-  "codeowners": [
-    "@bicycleboy"
-  ],
+  "codeowners": ["@bicycleboy"],
   "config_flow": true,
   "documentation": "https://github.com/bicycleboy/nsw_tas_fuel_station",
   "iot_class": "cloud_polling",
   "version": "0.0.1",
-  "requirements": []
+  "requirements": ["nsw-tas-fuel-api-client==0.0.1"]
 }
