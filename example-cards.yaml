@@ -1,0 +1,34 @@
+type: grid
+cards:
+  - type: heading
+    heading: Example Cards
+    heading_style: title
+  - type: tile
+    grid_options:
+      columns: 12
+      rows: 1
+    entity: sensor.home_cheapest_home_1
+    name: Cheapest near home
+    state_content:
+      - station_name
+      - fuel_type
+      - state
+      - last_updated
+    vertical: false
+    features_position: bottom
+  - graph: none
+    type: sensor
+    entity: sensor.home_cheapest_home_2
+    detail: 1
+    name: Good price today
+  - show_name: true
+    show_icon: false
+    show_state: true
+    type: glance
+    entities:
+      - entity: sensor.hobart_ampol_foodary_sandy_bay_u91
+        name: Ampol Sandy Bay
+      - entity: sensor.hobart_ampol_hobart_macquarie_st_u91
+        name: Ampol Macquarie St
+      - entity: sensor.hobart_coles_express_hobart_u91
+        name: Coles City
