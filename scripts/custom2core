@@ -5,7 +5,7 @@ set -e
 
 WS="/workspaces"
 CORE_DIR="$WS/ha-core"
-CUSTOM_DIR="$WS/nsw_tas_fuel_station/custom_components/nsw_fuel_station"
+CUSTOM_DIR="$WS/nsw_tas_fuel_station/custom_components/nsw_tas_fuel_station"
 CUSTOM_TEST_DIR="$WS/nsw_tas_fuel_station/tests"
 
 CORE_COMONENT_DIR="$CORE_DIR/homeassistant/components/nsw_fuel_station"
