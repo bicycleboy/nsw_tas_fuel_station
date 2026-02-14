@@ -8,7 +8,7 @@ ha_codeowners:
 ha_domain: nsw_fuel_station
 ha_integration_type: hub
 related:
-  - url: https://github.com/bicycleboy/nsw_fuel_station
+  - url: https://github.com/bicycleboy/nsw_fuel_tas_station
     title: Integration Source
   - url: https://https://github.com/bicycleboy/nsw-fuel-api-client
     title: API Client Source
