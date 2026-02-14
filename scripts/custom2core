@@ -18,6 +18,7 @@ cp $CUSTOM_DIR/translations/en.json strings.json
 grep -v -e "version" -e "issue_tracker" $CUSTOM_DIR/manifest.json > manifest.json
 sed -i 's|"domain":.*|"domain": "nsw_fuel_station",|' manifest.json
 sed -i 's|"documentation": *"[^"]*"|"documentation": "https://www.home-assistant.io/integrations/nsw_fuel_station"|' manifest.json
+# HACS requires sorted manifestkeys, API client name may change core vs custom, loose trailing comma
 sed -i 's|"requirements":[[:space:]]*\[[^]]*\]|"requirements": ["nsw-tas-fuel-api-client==0.0.1"]|' manifest.json
 
 sed -i 's|DOMAIN.*|DOMAIN = "nsw_fuel_station"|' const.py
