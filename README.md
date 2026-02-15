@@ -28,15 +28,20 @@ cd /config/custom_components
 mv /tmp/nsw_fuel_station/custom_components/nsw_fuel_station .
 
 ## Configuring NSW Fuel Check in the Home Assistant User Interface
-See [usage](./nsw_fuel_station.md).
+See the [user guide](./nsw_fuel_station.md).
+
+## Removing the integration
+Remove the integration in the standard way from:
+Settings -> Devices and Services -> Select NSW Fuel Check Integration -> three dots -> Delete.
+Delete cards from dashboards for all users.
 
 ## Repository Overview
 This repository contains:
 
 File | Purpose | Documentation
 -- | -- | --
-`.github/ISSUE_TEMPLATE/*.yml` | Templates for the issue tracker | [Documentation](https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository)
-`custom_components/*.py` | Integration files, this is where everything happens. |
+`.github/ISSUE_TEMPLATE` | Templates for the issue tracker | [Documentation](https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository)
+`custom_components/nsw_tas_fuel_check/*.py` | Integration files required in your installation. |
 `LICENSE` | The license file for the project. | [Documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/licensing-a-repository)
 `pyproject.toml` | Python setup and configuration for this integration. | [Documentation](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/)
 `tests/*.py` | Unit test files for each .py file without calling any real APIs. |
