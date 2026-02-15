@@ -8,9 +8,9 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from custom_components.nsw_fuel_station.const import DOMAIN
-from custom_components.nsw_fuel_station.coordinator import NSWFuelCoordinator
-from custom_components.nsw_fuel_station.sensor import (
+from custom_components.nsw_tas_fuel_station.const import DOMAIN
+from custom_components.nsw_tas_fuel_station.coordinator import NSWFuelCoordinator
+from custom_components.nsw_tas_fuel_station.sensor import (
     CheapestFuelPriceSensor,
     FuelPriceSensor,
     _attribution_for_state,

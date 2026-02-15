@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock
 from nsw_tas_fuel.dto import Price, Station, StationPrice
 import pytest
 
-from custom_components.nsw_fuel_station.const import DOMAIN
+from custom_components.nsw_tas_fuel_station.const import DOMAIN
 
 from tests.common import MockConfigEntry
 

@@ -2,14 +2,15 @@
 
 from unittest.mock import AsyncMock, patch
 
-from nsw_tas_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
 import pytest
-
 from homeassistant import config_entries
-from custom_components.nsw_fuel_station.const import DOMAIN
 from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from nsw_tas_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
+
+from custom_components.nsw_tas_fuel_station.const import DOMAIN
+from tests.common import MockConfigEntry
 
 from .conftest import (
     CLIENT_ID,
@@ -24,8 +25,6 @@ from .conftest import (
     STATION_TAS_D,
     STATION_TAS_E,
 )
-
-from tests.common import MockConfigEntry
 
 NSW_FUEL_API_DEFINITION = (
     "custom_components.nsw_fuel_station.config_flow.NSWFuelApiClient"
