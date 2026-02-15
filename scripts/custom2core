@@ -28,5 +28,5 @@ rm -f *.py
 cp $CUSTOM_TEST_DIR/*.py .
 
 sed \
-  's/custom_components\.nsw_fuel_station/homeassistant.components.nsw_fuel_station/g' \
+  's/custom_components\.nsw_tas_fuel_station/homeassistant.components.nsw_fuel_station/g' \
   conftest.py test_config_flow.py test_coordinator.py test_sensor.py
