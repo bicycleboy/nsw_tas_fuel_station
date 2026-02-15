@@ -12,9 +12,23 @@ Home Assistant Integration for the NSW Government Fuel Check API
 
 ## Example Cards for Your Home Assistant Dashboard
 
-![example cards](./images/example-cards.png)
+![example cards](./images/example_cards.png)
 
-[Example card yaml](https://github.com/bicycleboy/nsw_tas_fuel_station/blob/main/example-cards.yaml)
+[Example card yaml](https://github.com/bicycleboy/nsw_tas_fuel_station/blob/main/example_cards.yaml)
+
+## Installation
+Prior to release, install the Terminal add on, then git clone to the home assistant config/custom_components directory:
+
+cd /tmp
+
+git clone https://github.com/bicycleboy/nsw_tas_fuel_station.git
+
+cd /config/custom_components
+
+mv /tmp/nsw_fuel_station/custom_components/nsw_fuel_station .
+
+## Configuring NSW Fuel Check in the Home Assistant User Interface
+See [usage](./nsw_fuel_station.md).
 
 ## Repository Overview
 This repository contains:
@@ -29,14 +43,6 @@ File | Purpose | Documentation
 `README.md` | The file you are reading now. | [Documentation](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax)
 
 
-## Installation
-Prior to release git clone to the home assistant config/custom_components directory:
-
-cd /tmp
-
-git clone https://github.com/bicycleboy/nsw_tas_fuel_station.git
-
-mv nsw_fuel_station/custom_components/nsw_fuel_station <config directory>/custom_components
 
 ## Contributing
 Contributions and feedback welcome, please visit https://github.com/bicycleboy/nsw_tas_fuel_ui, select **Issues** and choose either bug report or feature request.
