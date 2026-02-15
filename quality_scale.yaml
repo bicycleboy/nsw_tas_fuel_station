@@ -15,10 +15,14 @@ rules:
   docs-high-level-description: done
   docs-installation-instructions: done
   docs-removal-instructions: done
-  entity-event-setup: done
+  entity-event-setup:
+    status: exempt
+    comment: This integration does not have entity events.
   entity-unique-id: done
   has-entity-name: done
-  runtime-data: done
+  runtime-data:
+    status: exempt
+    comment: This integration does not have runtime data.
   test-before-configure: done
   test-before-setup: done
   unique-config-entry: done
