@@ -3,12 +3,12 @@
 Home Assistant Integration for the NSW Government Fuel Check API
 
 ## Features
-- Allows users to include NSW and Tasmania fuel prices into their home assistant dashboards and automations.
-- This 2026 update allows the user to configure the integration via the user interface vs configuration.yaml.
+- Allows users to include NSW, ACT and Tasmanian fuel prices into their home assistant dashboards and automations.
+- This 2026 update allows the user to configure the integration via the user interface (vs configuration.yaml) and adds a  "cheapest today" sensor.
 
 ## Sensors
-- Sensors for favorite fuel station(s)
-- Sensors for cheapest fuel near location
+- Sensors for favorite fuel station(s) grouped by nickname/location e.g. home, work.
+- Sensors for cheapest fuel near nickname/location
 
 ## Example Cards for Your Home Assistant Dashboard
 
@@ -17,7 +17,7 @@ Home Assistant Integration for the NSW Government Fuel Check API
 [Example card yaml](https://github.com/bicycleboy/nsw_tas_fuel_station/blob/main/example_cards.yaml)
 
 ## Installation
-Prior to release, install the Terminal add on, then git clone to the home assistant config/custom_components directory:
+Prior to release, install the Terminal add on, then [git clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) to the home assistant config/custom_components directory:
 
 cd /tmp
 
@@ -34,6 +34,7 @@ See the [user guide](./nsw_fuel_station.md).
 Remove the integration in the standard way from:
 Settings -> Devices and Services -> Select NSW Fuel Check Integration -> three dots -> Delete.
 Delete cards from dashboards for all users.
+Reboot home assistant. 
 
 ## Repository Overview
 This repository contains:
