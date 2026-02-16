@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = [Platform.SENSOR]
 # Stations appear to update at random, it could be days between price changes
-DEFAULT_SCAN_INTERVAL = datetime.timedelta(minutes=720)
+DEFAULT_SCAN_INTERVAL = datetime.timedelta(minutes=120)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: NSWFuelConfigEntry) -> bool:
