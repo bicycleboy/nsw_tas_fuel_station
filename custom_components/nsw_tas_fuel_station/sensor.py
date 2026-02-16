@@ -148,7 +148,7 @@ class CheapestFuelPriceSensor(CoordinatorEntity[NSWFuelCoordinator], SensorEntit
 
         _LOGGER.debug(
             "Creating %s with unique_id=%s",
-            self.entity_id,
+            self._attr_name,
             self._attr_unique_id,
         )
 
