@@ -41,7 +41,7 @@
     "abort": {
       "already_configured": "This entry is already configured.",
       "no_available_stations": "Either you have already configured all nearby stations or try Add Service again with a different location.",
-      "updated_existing": "Added station(s) to existing nickname/location, or fuel to exisitng station."
+      "updated_existing": "Added station(s) to existing nickname/location, or fuel to existing station."
     }
   }
 }
