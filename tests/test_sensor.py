@@ -19,7 +19,7 @@ from custom_components.nsw_tas_fuel_station.sensor import (
     create_favorite_station_sensors,
 )
 
-from tests.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
