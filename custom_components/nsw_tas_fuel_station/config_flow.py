@@ -39,17 +39,19 @@ from .const import (
     CONF_NICKNAME,
     CONF_SELECTED_STATIONS,
     DEFAULT_FUEL_TYPE,
+    DEFAULT_FUEL_TYPE_NON_E10,
     DEFAULT_NICKNAME,
     DEFAULT_RADIUS_KM,
     DOMAIN,
-    E10_AVAILABLE_STATES,
-    E10_CODE,
     LAT_CAMERON_CORNER_BOUND,
     LAT_SE_BOUND,
+    LAT_TAS_BOUND,
     LON_CAMERON_CORNER_BOUND,
     LON_SE_BOUND,
     STATION_LIST_LIMIT,
 )
+
+from .coordinator import state_default_fuel
 
 if TYPE_CHECKING:
     from nsw_tas_fuel.client import StationPrice
@@ -104,9 +106,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         nickname = self._flow_data[CONF_NICKNAME]
 
-        if not self._flow_data.get(CONF_FUEL_TYPE):
-            self._flow_data[CONF_FUEL_TYPE] = DEFAULT_FUEL_TYPE
-
         # Create API client, allows invalid home zone to error to advanced path
         session = async_create_clientsession(self.hass)
         api = NSWFuelApiClient(
@@ -125,9 +124,9 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             }
             self._flow_data[CONF_LOCATION] = location
 
-        # Default Home zone may be outside ACT/TAS
+        # Default Home zone may be outside NSW/ACT/TAS
         try:
-            lat, lon = self._validate_location(self._flow_data[CONF_LOCATION])
+            lat, lon, au_state = self._validate_location(self._flow_data[CONF_LOCATION])
         except ValueError as err:
             errors["base"] = str(err)
             _LOGGER.debug("Invalid location: %s", err)
@@ -139,13 +138,16 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors=errors,
             )
 
+        if not self._flow_data.get(CONF_FUEL_TYPE):
+            self._flow_data[CONF_FUEL_TYPE] = state_default_fuel(au_state)
+
         # Store metadata to save coordinator additional api calls
         nicknames = self._flow_data.setdefault("nicknames", {})
         nickname_data = nicknames.setdefault(nickname, {})
         nickname_data["location"] = {"latitude": lat, "longitude": lon}
 
         # First network API call in config flow
-        errors = await self._get_station_list(lat, lon, DEFAULT_FUEL_TYPE)
+        errors = await self._get_station_list(lat, lon, self._flow_data[CONF_FUEL_TYPE])
         if errors:
             return self.async_show_form(
                 step_id="user",
@@ -168,33 +170,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         """
         errors: dict[str, str] = {}
 
-        default_fuel = (
-            self._flow_data.get(CONF_FUEL_TYPE, DEFAULT_FUEL_TYPE) == DEFAULT_FUEL_TYPE
-        )
-
-        if default_fuel:
-            existing_station_codes = set()
-
-            for entry in self.hass.config_entries.async_entries(DOMAIN):
-                for loc_data in entry.data.get("nicknames", {}).values():
-                    for station in loc_data.get("stations", []):
-                        existing_station_codes.add(str(station["station_code"]))
-
-            # Ignoring nickname grouping, remove any existing stations
-            # Assume station id unique for now, ie no user interested in both NSW & TAS
-            available_stations = [
-                sp
-                for sp in self._nearby_station_prices
-                if str(sp.station.code) not in existing_station_codes
-            ]
-
-            if not available_stations:
-                return self.async_abort(reason="no_available_stations")
-        else:
-            # Non-default fuel type, user may want additional fuels at existing
-            # stations, so dont deduplicate
-            available_stations = self._nearby_station_prices
-
         adv_label = await self._get_advanced_option_label()
 
         # First time through we want to show the user "Find more stations..."
@@ -202,7 +177,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             return self.async_show_form(
                 step_id="station_select",
                 data_schema=self._build_station_schema(
-                    available_stations, advanced_label=adv_label
+                    self._nearby_station_prices, advanced_label=adv_label
                 ),
                 errors=errors,
             )
@@ -214,20 +189,22 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         if selected_codes_str == ["__advanced__"]:
             return await self.async_step_advanced_options()
 
-        # User selected stations *and* "Find more...." so ignore
+        # User selected stations *and* "Find more....", ignore "Find more..."
         selected_codes_str = [
             code for code in selected_codes_str if code != "__advanced__"
         ]
 
         selected_codes = [int(x) for x in selected_codes_str]
 
-        # User did not select anythning
+        # User did not select anything
         if not selected_codes:
             errors["base"] = "no_stations"
             return self.async_show_form(
                 step_id="station_select",
                 data_schema=self._build_station_schema(
-                    available_stations, user_input=self._last_form, advanced_label=""
+                    self._nearby_station_prices,
+                    user_input=self._last_form,
+                    advanced_label="",
                 ),
                 errors=errors,
             )
@@ -238,7 +215,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         self._flow_data.update(user_input)
 
         nickname = self._flow_data[CONF_NICKNAME]
-        selected_fuel = self._flow_data[CONF_FUEL_TYPE]
+        selected_fuel_code = self._flow_data[CONF_FUEL_TYPE]
 
         updating_entry: config_entries.ConfigEntry | None = None
 
@@ -249,11 +226,15 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         if updating_entry is None:
             return await self._create_new_config_entry(
-                nickname, selected_codes, selected_fuel
+                nickname, selected_codes, selected_fuel_code
             )
 
         return await self._update_existing_entry(
-            updating_entry, nickname, selected_codes, selected_fuel, available_stations
+            updating_entry,
+            nickname,
+            selected_codes,
+            selected_fuel_code,
+            self._nearby_station_prices,
         )
 
     async def async_step_advanced_options(
@@ -297,7 +278,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         # Locations outside NSW/TAS currently unsupported
         try:
-            lat, lon = self._validate_location(user_input.get(CONF_LOCATION))
+            lat, lon, au_state = self._validate_location(user_input.get(CONF_LOCATION))
         except ValueError as err:
             errors["base"] = str(err)
 
@@ -309,11 +290,12 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors=errors,
             )
 
+        # Schema ensures a valid fuel value
         fuel_type = user_input.get(CONF_FUEL_TYPE)
-        if not isinstance(fuel_type, str):
-            fuel_type = DEFAULT_FUEL_TYPE
-
         self._flow_data[CONF_FUEL_TYPE] = fuel_type
+
+        # Save location in case user returns to advanced options
+        self._flow_data[CONF_LOCATION] = {"latitude": lat, "longitude": lon}
 
         # Initialise nickname structure
         nicknames = self._flow_data.setdefault("nicknames", {})
@@ -340,7 +322,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         self,
         nickname: str,
         selected_codes: list[int],
-        selected_fuel: str,
+        selected_fuel_code: str,
     ) -> config_entries.ConfigFlowResult:
         """Create a config entry for a new nickname.
 
@@ -364,10 +346,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                             "station_code": code,
                             "au_state": self._station_lookup[code]["au_state"],
                             "station_name": self._station_lookup[code]["station_name"],
-                            "fuel_types": _add_e10_to_u91_if_available(
-                                self._station_lookup[code]["au_state"],
-                                selected_fuel,
-                            ),
+                            "fuel_types": _split_combo_fuel_code(selected_fuel_code),
                         }
                         for code in selected_codes
                     ],
@@ -385,7 +364,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         updating_entry: config_entries.ConfigEntry,
         nickname: str,
         selected_station_codes: list[int],
-        selected_fuel: str,
+        selected_fuel_code: str,
         available_stations: list[StationPrice],
     ) -> config_entries.ConfigFlowResult:
         """Merge user selection with existing config entry.
@@ -404,29 +383,33 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             for ft in st.get("fuel_types", []):
                 existing_sensors.add((st["station_code"], st["au_state"], ft))
 
-        # In advanced path duplicates are possible, so alert user to existing sensor
-        for selected_station_code in selected_station_codes:
-            station_lookup = self._station_lookup[selected_station_code]
-            sensor_key = (
-                selected_station_code,
-                station_lookup["au_state"],
-                selected_fuel,
-            )
+            selected_fuels = _split_combo_fuel_code(selected_fuel_code)
 
-            if sensor_key in existing_sensors:
-                return self.async_show_form(
-                    step_id="station_select",
-                    data_schema=self._build_station_schema(
-                        available_stations,
-                        user_input=self._last_form,
-                        advanced_label=await self._get_advanced_option_label(),
-                    ),
-                    errors={"base": "sensor_exists"},
-                    description_placeholders={
-                        "station": station_lookup["station_name"],
-                        "fuel": selected_fuel,
-                    },
-                )
+            # Alert user to existing sensor
+            for selected_station_code in selected_station_codes:
+                station_lookup = self._station_lookup[selected_station_code]
+
+                for fuel in selected_fuels:
+                    sensor_key = (
+                        selected_station_code,
+                        station_lookup["au_state"],
+                        fuel,
+                    )
+
+                    if sensor_key in existing_sensors:
+                        return self.async_show_form(
+                            step_id="station_select",
+                            data_schema=self._build_station_schema(
+                                available_stations,
+                                user_input=self._last_form,
+                                advanced_label=await self._get_advanced_option_label(),
+                            ),
+                            errors={"base": "sensor_exists"},
+                            description_placeholders={
+                                "station": station_lookup["station_name"],
+                                "fuel": fuel,
+                            },
+                        )
 
         merged_stations_map: dict[tuple[int, str], dict[str, Any]] = {
             (st["station_code"], st["au_state"]): dict(st) for st in existing_stations
@@ -441,16 +424,15 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 fuels = set(
                     merged_stations_map[station_state_key].get("fuel_types", [])
                 )
-                fuels.add(selected_fuel)
+
+                fuels.update(_split_combo_fuel_code(selected_fuel_code))
                 merged_stations_map[station_state_key]["fuel_types"] = sorted(fuels)
             else:
                 merged_stations_map[station_state_key] = {
                     "station_code": selected_station_code,
                     "au_state": station_lookup["au_state"],
                     "station_name": station_lookup["station_name"],
-                    "fuel_types": _add_e10_to_u91_if_available(
-                        station_lookup["au_state"], selected_fuel
-                    ),
+                    "fuel_types": _split_combo_fuel_code(selected_fuel_code),
                 }
 
         merged_stations = list(merged_stations_map.values())
@@ -477,27 +459,30 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self.async_abort(reason="updated_existing")
 
-    def _build_user_schema(self, user_input: dict | None = None) -> vol.Schema:
+    def _build_user_schema(
+        self, user_input: dict[str, Any] | None = None
+    ) -> vol.Schema:
         """Build config flow UI schema to get API credentials."""
-        user = user_input or self._flow_data
 
-        suggested_client_id = user.get(CONF_CLIENT_ID, "")
-        suggested_client_secret = user.get(CONF_CLIENT_SECRET, "")
-
-        return vol.Schema(
+        schema = vol.Schema(
             {
-                vol.Required(
-                    CONF_CLIENT_ID,
-                    default=user.get(CONF_CLIENT_ID, vol.UNDEFINED),
-                    description={"suggested_value": suggested_client_id},
-                ): TextSelector(),
-                vol.Required(
-                    CONF_CLIENT_SECRET,
-                    default=user.get(CONF_CLIENT_SECRET, vol.UNDEFINED),
-                    description={"suggested_value": suggested_client_secret},
-                ): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
+                vol.Required(CONF_CLIENT_ID): TextSelector(),
+                vol.Required(CONF_CLIENT_SECRET): TextSelector(
+                    TextSelectorConfig(type=TextSelectorType.PASSWORD)
+                ),
             }
         )
+
+        config_entry = {}
+
+        if user_input:
+            config_entry = user_input
+        else:
+            entries = self._async_current_entries()
+            if entries:
+                config_entry = entries[0].data
+
+        return self.add_suggested_values_to_schema(schema, config_entry)
 
     def _build_station_schema(
         self,
@@ -556,16 +541,15 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         )
 
         try:
-            suggested_location = user.get(
-                CONF_LOCATION,
-                {
+            suggested_location = self._flow_data.get(CONF_LOCATION)
+
+            if not suggested_location:
+                suggested_location = {
                     "latitude": getattr(self.hass.config, "latitude", None),
                     "longitude": getattr(self.hass.config, "longitude", None),
-                },
-            )
+                }
 
-            suggested_fuel_type = user.get(CONF_FUEL_TYPE, DEFAULT_FUEL_TYPE)
-
+            suggested_fuel, fuel_types = _get_state_defaults(suggested_location)
             return vol.Schema(
                 {
                     vol.Required(
@@ -585,7 +569,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                     ),
                     vol.Required(
                         CONF_FUEL_TYPE,
-                        default=suggested_fuel_type,
+                        default=suggested_fuel,
                     ): SelectSelector(
                         SelectSelectorConfig(
                             options=[
@@ -593,7 +577,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                                     value=code,
                                     label=name,
                                 )
-                                for code, name in ALL_FUEL_TYPES.items()
+                                for code, name in fuel_types
                             ],
                             multiple=False,
                             sort=False,
@@ -608,7 +592,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
     def _validate_location(
         self, location: dict[str, Any] | None
-    ) -> tuple[float, float]:
+    ) -> tuple[float, float, str]:
         """Return lat & long if valid and roughly within NSW/TAS or raise ValueError."""
         if location is None or not isinstance(location, dict):
             msg = "invalid_coordinates"
@@ -626,7 +610,10 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             msg = "invalid_coordinates"
             raise ValueError(msg)
 
-        return lat, lon
+        # Hardcode basic latitude test for now
+        au_state = "TAS" if lat < LAT_TAS_BOUND else "NSW"
+
+        return lat, lon, au_state
 
     async def _get_station_list(
         self,
@@ -643,10 +630,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         errors = {}
 
         try:
-            _LOGGER.debug(
-                "Fetching stations near %s,%s for fuel type=%s", lat, lon, fuel_type
-            )
-
             if not self.api:
                 raise HomeAssistantError("API client not initialized")
 
@@ -657,7 +640,19 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 fuel_type=fuel_type,
             )
 
-            self._nearby_station_prices = nearby[:STATION_LIST_LIMIT]
+            # E10-U91 returns multiple rows per station
+            seen: set[str] = set()
+            unique_prices = []
+            for sp in nearby:
+                station_code = sp.station.code
+
+                if station_code in seen:
+                    continue
+
+                seen.add(station_code)
+                unique_prices.append(sp)
+
+            self._nearby_station_prices = unique_prices[:STATION_LIST_LIMIT]
 
             # Build station lookup by station code
             self._station_lookup = {}
@@ -698,24 +693,42 @@ def _format_station_option(sp: StationPrice) -> str:
     return f"{st.name} - {st.address} ({st.code})"
 
 
-def _add_e10_to_u91_if_available(
-    au_state: str,
-    selected_fuel: str,
-) -> list[str]:
-    """Automatically add an e10 sensor if e10 widely available.
+def _split_combo_fuel_code(selected_fuel_code: str | None) -> list[str]:
+    """Convert a fuel code string (e.g., 'E10-U91') into a list of fuels.
 
-    Searching nearest with U91 most reliable, particualry in TAS.
-    Hardcode adding e10 to avoid additional API lookup since e10
-    availability is legislated in NSW and user can delete unavailable
-    sensors.
+    The API returns the best results in NSW with E10-U91 so need special handling
+
+    Returns:
+        List of individual fuel codes, e.g. ['E10', 'U91'].
+        If input is None or empty, returns an empty list.
     """
-    fuels = [selected_fuel]
+    if not selected_fuel_code:
+        return []
+    return [fuel.strip() for fuel in selected_fuel_code.split("-") if fuel.strip()]
 
-    if (
-        au_state in E10_AVAILABLE_STATES
-        and selected_fuel == DEFAULT_FUEL_TYPE
-        and E10_CODE not in fuels
-    ):
-        fuels.append(E10_CODE)
 
-    return fuels
+def _get_state_defaults(
+    suggested_location: dict[str, Any],
+) -> tuple[str, list[tuple[str, str]]]:
+    """Get default fuel type and available fuel types for a location.
+
+    NSW supports combo codes (E10-U91), while TAS does not.
+    API returns good results for E10-U91 in NSW.
+    In TAS, E10-U91 returns NSW results, so we limit to U91 only.
+
+    Args:
+        suggested_location: Dict with at least 'latitude' key
+
+    Returns:
+        Tuple of (default_fuel_type, fuel_types_list)
+    """
+    latitude = suggested_location.get("latitude")
+
+    # NSW supports combo codes, since we only support 2 states, just use lat for now
+    if latitude is not None and latitude >= LAT_TAS_BOUND:
+        return DEFAULT_FUEL_TYPE, list(ALL_FUEL_TYPES.items())
+
+    # TAS default to U91
+    return DEFAULT_FUEL_TYPE_NON_E10, [
+        (code, name) for code, name in ALL_FUEL_TYPES.items() if "-" not in code
+    ]
