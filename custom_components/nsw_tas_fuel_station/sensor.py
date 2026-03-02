@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 import logging
 from typing import TYPE_CHECKING, Any
 
@@ -201,6 +202,8 @@ class CheapestFuelPriceSensor(CoordinatorEntity[NSWFuelCoordinator], SensorEntit
             "rank": self._rank,
             "fuel_type": station_price["fuel_type"],
             "price": station_price["price"],
+            "price_last_changed": station_price.get("last_updated"),
+            "price_last_checked": datetime.now().strftime("%d %b %H:%M")
         }
 
 
