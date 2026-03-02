@@ -2,12 +2,11 @@
 
 from unittest.mock import AsyncMock, MagicMock
 
-from nsw_tas_fuel.dto import Price, Station, StationPrice
 import pytest
+from nsw_tas_fuel.dto import Price, Station, StationPrice
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.nsw_tas_fuel_station.const import DOMAIN
-
-from tests.common import MockConfigEntry
 
 LATITUDE = -35.28
 LONGITUDE = 149.13
@@ -58,10 +57,8 @@ FUEL_PRICES = {
     },
     STATION_NSW_B: {
         "U91": 172.0,
-        "E10": 167.0,
     },
     STATION_NSW_C: {
-        "U91": 168.9,
         "E10": 163.5,
         "DL": 178.2,
     },
@@ -129,8 +126,17 @@ def mock_api_client_fixture():
             station_code = station_data["station_code"]
             station_prices = FUEL_PRICES.get(station_code, {})
 
+            # Support combo fuel types like 'E10-U91' by splitting and
+            # matching any individual fuel type
+            allowed_fuels = None
+            if fuel_type:
+                if "-" in fuel_type:
+                    allowed_fuels = set(fuel_type.split("-"))
+                else:
+                    allowed_fuels = {fuel_type}
+
             for fuel, price_value in station_prices.items():
-                if fuel_type and fuel != fuel_type:
+                if allowed_fuels is not None and fuel not in allowed_fuels:
                     continue
 
                 station = Station(
