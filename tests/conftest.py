@@ -3,6 +3,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from homeassistant.core import HomeAssistant
 from nsw_tas_fuel.dto import Price, Station, StationPrice
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -76,6 +77,15 @@ FUEL_PRICES = {
 def auto_enable_custom_integrations(enable_custom_integrations: None) -> None:
     """Automatically enable custom integrations for all tests."""
     return
+
+
+@pytest.fixture
+async def hass_with_config(hass: HomeAssistant) -> HomeAssistant:
+    """Set up hass with standard NSW config (latitude, longitude, timezone)."""
+    hass.config.latitude = HOME_LAT
+    hass.config.longitude = HOME_LNG
+    hass.config.time_zone = "Australia/Sydney"
+    return hass
 
 
 @pytest.fixture(name="mock_api_client")

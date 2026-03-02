@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from nsw_tas_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
 from custom_components.nsw_tas_fuel_station.config_flow import (
-     NSWFuelConfigFlow,
+    NSWFuelConfigFlow,
     _get_state_defaults,
     _split_combo_fuel_code,
 )
@@ -36,6 +36,23 @@ from .conftest import (
     STATION_TAS_D,
     STATION_TAS_E,
 )
+
+
+async def _start_flow_and_submit_creds(
+    hass: HomeAssistant, client_id: str, client_secret: str
+) -> dict[str, Any]:
+    """Start a config flow and submit API credentials.
+
+    Returns the final step dict from hass.config_entries.flow.async_configure.
+    """
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    return await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {"client_id": client_id, "client_secret": client_secret},
+    )
+
 
 NSW_FUEL_API_DEFINITION = (
     "custom_components.nsw_tas_fuel_station.config_flow.NSWFuelApiClient"
@@ -71,22 +88,12 @@ async def test_successful_config_flow(
     hass.config.time_zone = "Australia/Sydney"
 
     with patch(NSW_FUEL_API_DEFINITION, return_value=mock_api_client):
-        # Step 1: Start flow - show credentials form
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
-        assert result["type"] is FlowResultType.FORM
-        assert result["step_id"] == "user"
-
-        # Step 2: Submit credentials
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
-        )
+        # Start flow and submit credentials
+        result = await _start_flow_and_submit_creds(hass, CLIENT_ID, CLIENT_SECRET)
         assert result["type"] is FlowResultType.FORM
         assert result["step_id"] == "station_select"
 
-        # Step 3: Select station
+        # Select station
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {"selected_station_codes": [str(station_code)]},
@@ -167,7 +174,7 @@ async def test_successful_advanced_config_flow(
         # No combo (dash) codes should be present for TAS
         assert not any("-" in c for c in codes)
 
-    # Ensure hass location is set for the flow 
+    # Ensure hass location is set for the flow
     hass.config.latitude = latitude
     hass.config.longitude = longitude
     hass.config.time_zone = "Australia/Sydney"
@@ -177,13 +184,7 @@ async def test_successful_advanced_config_flow(
 
     with patch(NSW_FUEL_API_DEFINITION, return_value=mock_api_client):
         # Start flow and submit credentials
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
-
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"], {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET}
-        )
+        result = await _start_flow_and_submit_creds(hass, CLIENT_ID, CLIENT_SECRET)
 
         # Choose advanced options
         result = await hass.config_entries.flow.async_configure(
@@ -208,29 +209,19 @@ async def test_successful_advanced_config_flow(
 
 
 async def test_no_station_selected_error(
-    hass: HomeAssistant, mock_api_client: AsyncMock
+    hass_with_config: HomeAssistant, mock_api_client: AsyncMock
 ) -> None:
     """Test error when user doesn't select any station."""
-    hass.config.latitude = HOME_LAT
-    hass.config.longitude = HOME_LNG
-
-    with (
-        patch(
-            NSW_FUEL_API_DEFINITION,
-            return_value=mock_api_client,
-        ),
+    with patch(
+        NSW_FUEL_API_DEFINITION,
+        return_value=mock_api_client,
     ):
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
-
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
+        result = await _start_flow_and_submit_creds(
+            hass_with_config, CLIENT_ID, CLIENT_SECRET
         )
 
         # Submit empty station list
-        result = await hass.config_entries.flow.async_configure(
+        result = await hass_with_config.config_entries.flow.async_configure(
             result["flow_id"],
             {"selected_station_codes": []},
         )
@@ -241,11 +232,9 @@ async def test_no_station_selected_error(
 
 
 async def test_add_station_to_existing_nickname(
-    hass: HomeAssistant, mock_api_client: AsyncMock
+    hass_with_config: HomeAssistant, mock_api_client: AsyncMock
 ) -> None:
     """Test adding second station to existing nickname."""
-    hass.config.latitude = HOME_LAT
-    hass.config.longitude = HOME_LNG
 
     # Add existing entry
     existing_entry = MockConfigEntry(
@@ -269,25 +258,18 @@ async def test_add_station_to_existing_nickname(
         source=config_entries.SOURCE_USER,
         version=1,
     )
-    existing_entry.add_to_hass(hass)
+    existing_entry.add_to_hass(hass_with_config)
 
-    with (
-        patch(
-            NSW_FUEL_API_DEFINITION,
-            return_value=mock_api_client,
-        ),
+    with patch(
+        NSW_FUEL_API_DEFINITION,
+        return_value=mock_api_client,
     ):
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
+        result = await _start_flow_and_submit_creds(
+            hass_with_config, CLIENT_ID, CLIENT_SECRET
         )
 
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
-        )
 
-        # Station A should be filtered out, only B available
-        result = await hass.config_entries.flow.async_configure(
+        result = await hass_with_config.config_entries.flow.async_configure(
             result["flow_id"],
             {"selected_station_codes": [str(STATION_NSW_B)]},
         )
@@ -297,7 +279,7 @@ async def test_add_station_to_existing_nickname(
         assert result["reason"] == "updated_existing"
 
         # Verify the entry was updated with both stations
-        entries = hass.config_entries.async_entries(DOMAIN)
+        entries = hass_with_config.config_entries.async_entries(DOMAIN)
         assert len(entries) == 1
         home = entries[0].data["nicknames"]["Home"]
         station_codes = [s["station_code"] for s in home["stations"]]
@@ -305,212 +287,128 @@ async def test_add_station_to_existing_nickname(
         assert STATION_NSW_B in station_codes
 
 
-async def test_invalid_credentials(
-    hass: HomeAssistant,
+@pytest.mark.parametrize(
+    ("exception_class", "error_message", "expected_error_key"),
+    [
+        (NSWFuelApiClientAuthError, "Invalid credentials", "auth"),
+        (NSWFuelApiClientError, "Request timeout (408)", "connection"),
+        (NSWFuelApiClientError, "Bad request (400)", "connection"),
+        (NSWFuelApiClientError, "Internal server error (500)", "connection"),
+    ],
+    ids=[
+        "auth-invalid-credentials",
+        "connection-timeout-408",
+        "connection-bad-request-400",
+        "connection-server-error-500",
+    ],
+)
+async def test_api_errors_on_station_fetch(
+    hass_with_config: HomeAssistant,
+    exception_class: type,
+    error_message: str,
+    expected_error_key: str,
 ) -> None:
-    """Test invalid API credentials."""
-    hass.config.latitude = HOME_LAT
-    hass.config.longitude = HOME_LNG
-
-    bad_client = AsyncMock()
-    bad_client.get_fuel_prices_within_radius = AsyncMock(
-        side_effect=NSWFuelApiClientAuthError("Invalid credentials")
+    """Test API error handling (auth and connection errors) when fetching stations."""
+    error_client = AsyncMock()
+    error_client.get_fuel_prices_within_radius = AsyncMock(
+        side_effect=exception_class(error_message)
     )
 
-    with (
-        patch(
-            NSW_FUEL_API_DEFINITION,
-            return_value=bad_client,
-        ),
-    ):
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
-
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": "bad", "client_secret": "bad"},
+    with patch(NSW_FUEL_API_DEFINITION, return_value=error_client):
+        result = await _start_flow_and_submit_creds(
+            hass_with_config, CLIENT_ID, CLIENT_SECRET
         )
 
         # Should show error on user form
         assert result["type"] is FlowResultType.FORM
         assert result["step_id"] == "user"
-        assert result["errors"]
-
-
-async def test_timeout_error_on_station_fetch(
-    hass: HomeAssistant,
-) -> None:
-    """Test timeout (408) error handling when fetching stations."""
-    hass.config.latitude = HOME_LAT
-    hass.config.longitude = HOME_LNG
-
-    timeout_client = AsyncMock()
-    timeout_client.get_fuel_prices_within_radius = AsyncMock(
-        side_effect=NSWFuelApiClientError("Request timeout (408)")
-    )
-
-    with (
-        patch(
-            NSW_FUEL_API_DEFINITION,
-            return_value=timeout_client,
-        ),
-    ):
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
-
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
-        )
-
-        # Should show connection error on user form
-        assert result["type"] is FlowResultType.FORM
-        assert result["step_id"] == "user"
         assert "base" in result["errors"]
-        assert result["errors"]["base"] == "connection"
+        assert result["errors"]["base"] == expected_error_key
 
 
 @pytest.mark.parametrize(
-    "error_message",
+    "mode",
     [
-        "Request timeout (408)",
-        "Bad request (400)",
-        "Internal server error (500)",
+        "home_invalid",
+        "advanced_invalid",
     ],
-    ids=[
-        "408-timeout",
-        "400-bad-request",
-        "500-server-error",
-    ],
+    ids=["home-invalid", "advanced-invalid"],
 )
-async def test_api_connection_errors_on_station_fetch(
+async def test_invalid_location_handling(
     hass: HomeAssistant,
-    error_message: str,
+    mock_api_client: AsyncMock,
+    mode: str,
 ) -> None:
-    """Test various API connection errors (4xx and 5xx) when fetching stations."""
-    hass.config.latitude = HOME_LAT
-    hass.config.longitude = HOME_LNG
+    """Parameterized invalid-location tests for both entry points.
 
-    error_client = AsyncMock()
-    error_client.get_fuel_prices_within_radius = AsyncMock(
-        side_effect=NSWFuelApiClientError(error_message)
-    )
+    - `home_invalid`: hass.config is invalid, credentials submission should
+      route the flow directly to `advanced_options`.
+    - `advanced_invalid`: normal hass.config; user navigates to advanced
+      options and submits an invalid location, which should redisplay the
+      `advanced_options` form with `invalid_coordinates` error.
+    """
+    if mode == "home_invalid":
+        # Set hass home location outside service area (South Pole)
+        hass.config.latitude = -90.0
+        hass.config.longitude = 0.0
 
-    with (
-        patch(
-            NSW_FUEL_API_DEFINITION,
-            return_value=error_client,
-        ),
-    ):
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
+        mock_client = AsyncMock()
 
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
-        )
+        with patch(NSW_FUEL_API_DEFINITION, return_value=mock_client):
+            result = await _start_flow_and_submit_creds(hass, CLIENT_ID, CLIENT_SECRET)
 
-        # All API errors should show connection error on user form
+            # Should go to advanced options due to invalid location
+            assert result["type"] is FlowResultType.FORM
+            assert result["step_id"] == "advanced_options"
 
+    else:
+        # advanced_invalid: ensure hass has a valid home location
+        hass.config.latitude = HOME_LAT
+        hass.config.longitude = HOME_LNG
 
-async def test_invalid_location_goes_to_advanced(
-    hass: HomeAssistant,
-) -> None:
-    """Test invalid location (outside service area) routes to advanced options."""
-    # Set location outside Australia (South Pole)
-    hass.config.latitude = -90.0
-    hass.config.longitude = 0.0
+        with patch(NSW_FUEL_API_DEFINITION, return_value=mock_api_client):
+            # Start and progress to station_select
+            result = await _start_flow_and_submit_creds(hass, CLIENT_ID, CLIENT_SECRET)
 
-    mock_client = AsyncMock()
+            assert result["type"] is FlowResultType.FORM
+            assert result["step_id"] == "station_select"
 
-    with (
-        patch(
-            NSW_FUEL_API_DEFINITION,
-            return_value=mock_client,
-        ),
-    ):
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
+            # Enter advanced options
+            result = await hass.config_entries.flow.async_configure(
+                result["flow_id"],
+                {"selected_station_codes": ["__advanced__"]},
+            )
 
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
-        )
+            assert result["type"] is FlowResultType.FORM
+            assert result["step_id"] == "advanced_options"
 
-        # Should go to advanced options due to invalid location
-        assert result["type"] is FlowResultType.FORM
-        assert result["step_id"] == "advanced_options"
+            # Submit advanced options with INVALID location (South Pole)
+            result = await hass.config_entries.flow.async_configure(
+                result["flow_id"],
+                {
+                    "nickname": "Work",
+                    "location": {"latitude": -90.0, "longitude": 0.0},
+                    "fuel_type": "U91",
+                },
+            )
 
-
-async def test_invalid_location_in_advanced_options(
-    hass: HomeAssistant, mock_api_client: AsyncMock
-) -> None:
-    """Test invalid location handling when submitting advanced options form."""
-    hass.config.latitude = HOME_LAT
-    hass.config.longitude = HOME_LNG
-
-    with (
-        patch(
-            NSW_FUEL_API_DEFINITION,
-            return_value=mock_api_client,
-        ),
-    ):
-        # Start with valid location to get to station_select step
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
-
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
-        )
-
-        assert result["type"] is FlowResultType.FORM
-        assert result["step_id"] == "station_select"
-
-        # Select advanced options
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"selected_station_codes": ["__advanced__"]},
-        )
-
-        assert result["type"] is FlowResultType.FORM
-        assert result["step_id"] == "advanced_options"
-
-        # Submit advanced options with INVALID location (South Pole - outside NSW/TAS)
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {
-                "nickname": "Work",
-                "location": {"latitude": -90.0, "longitude": 0.0},
-                "fuel_type": "U91",
-            },
-        )
-
-        # Should show error and remain on advanced_options
-        assert result["type"] is FlowResultType.FORM
-        assert result["step_id"] == "advanced_options"
-        assert "base" in result["errors"]
-        assert result["errors"]["base"] == "invalid_coordinates"
+            # Should show error and remain on advanced_options
+            assert result["type"] is FlowResultType.FORM
+            assert result["step_id"] == "advanced_options"
+            assert "base" in result["errors"]
+            assert result["errors"]["base"] == "invalid_coordinates"
 
 
 async def test_error_fetching_stations_in_advanced_options(
-    hass: HomeAssistant, mock_api_client: AsyncMock
+    hass_with_config: HomeAssistant, mock_api_client: AsyncMock
 ) -> None:
     """API errors during station lookup should redisplay the advanced form.
 
-    The error branch in :meth:`async_step_advanced_options` is exercised when
-    :meth:`_get_station_list` returns a non-empty ``errors`` dict.  This test
-    forces the underlying API call to raise ``NSWFuelApiClientError`` which is
-    translated into a ``connection`` error key.
+    The error branch in async_step_advanced_options is exercised when
+   _get_station_list returns a non-empty errors dict.  This test
+    forces the underlying API call to raise NSWFuelApiClientError which is
+    translated into a connection error key.
     """
-    hass.config.latitude = HOME_LAT
-    hass.config.longitude = HOME_LNG
-
     # use the normal mock_api_client fixture but override its radius method so
     # the first invocation returns a real result and the second raises an error.
     # grab the original method so we can call it for the first invocation
@@ -534,24 +432,20 @@ async def test_error_fetching_stations_in_advanced_options(
         return_value=mock_api_client,
     ):
         # initialise flow and move to station_select
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
+        result = await _start_flow_and_submit_creds(
+            hass_with_config, CLIENT_ID, CLIENT_SECRET
         )
         assert result["step_id"] == "station_select"
 
         # navigate into advanced options
-        result = await hass.config_entries.flow.async_configure(
+        result = await hass_with_config.config_entries.flow.async_configure(
             result["flow_id"],
             {"selected_station_codes": ["__advanced__"]},
         )
         assert result["step_id"] == "advanced_options"
 
         # submit valid advanced options; the API will error
-        result = await hass.config_entries.flow.async_configure(
+        result = await hass_with_config.config_entries.flow.async_configure(
             result["flow_id"],
             {
                 "nickname": "Work",
@@ -573,21 +467,12 @@ async def test_invalid_nickname_in_advanced_options(
     hass.config.latitude = HOME_LAT
     hass.config.longitude = HOME_LNG
 
-    with (
-        patch(
-            NSW_FUEL_API_DEFINITION,
-            return_value=mock_api_client,
-        ),
+    with patch(
+        NSW_FUEL_API_DEFINITION,
+        return_value=mock_api_client,
     ):
         # Start with valid location to get to station_select step
-        result = await hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_USER}
-        )
-
-        result = await hass.config_entries.flow.async_configure(
-            result["flow_id"],
-            {"client_id": CLIENT_ID, "client_secret": CLIENT_SECRET},
-        )
+        result = await _start_flow_and_submit_creds(hass, CLIENT_ID, CLIENT_SECRET)
 
         assert result["type"] is FlowResultType.FORM
         assert result["step_id"] == "station_select"
@@ -1046,7 +931,6 @@ async def test_advanced_options_uses_hass_config_location_fallback(
                 "longitude": getattr(self.hass.config, "longitude", None),
             }
     """
-
 
     # Set hass.config location (will be used as fallback)
     hass.config.latitude = HOME_LAT
