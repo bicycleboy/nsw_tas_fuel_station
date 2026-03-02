@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "nsw_fuel_station"
+name = "nsw_tas_fuel_station"
 version = "0.0.1"
 readme = "README.md"
 description = "Home Assistant Integration for NSW Fuel Check API"
@@ -14,8 +14,7 @@ authors = [
 license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = [
-    "homeassistant>=2025.12.0",
-    "nsw-fuel-api-cient == 0.0.1"
+    "nsw-tas-fuel-api-client == 0.0.1"
 ]
 
 classifiers = [
@@ -25,7 +24,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/bicycleboy/nsw_fuel_station"
+Homepage = "https://github.com/bicycleboy/nsw_tas_fuel_station"
 
 [project.optional-dependencies]
 test = [
@@ -41,7 +40,7 @@ test = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["nsw_fuel_station"]
+include = ["custom_components/nsw_tas_fuel_station"]
 
 [tool.pytest.ini_options]
 # Automatically discover tests inside these paths
