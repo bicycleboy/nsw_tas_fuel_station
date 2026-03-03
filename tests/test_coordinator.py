@@ -12,12 +12,8 @@ from homeassistant.helpers.update_coordinator import UpdateFailed
 from nsw_tas_fuel import (
     NSWFuelApiClientAuthError,
     NSWFuelApiClientError,
-    Price,
-    Station,
-    StationPrice,
 )
 
-from custom_components.nsw_tas_fuel_station.const import DEFAULT_FUEL_TYPE
 from custom_components.nsw_tas_fuel_station.coordinator import NSWFuelCoordinator
 
 from .conftest import (
@@ -186,6 +182,7 @@ async def test_async_update_api_failure(
 
     with pytest.raises(UpdateFailed):
         await coordinator._async_update_data()
+
 
 def test_nicknames_property(coordinator: NSWFuelCoordinator) -> None:
     """Nicknames property exposes configured nicknames."""
