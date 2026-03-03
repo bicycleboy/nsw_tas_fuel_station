@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+pkill hass
+cd /workspaces/ha-custom
+sleep 1
+hass -c config&
