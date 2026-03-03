@@ -19,7 +19,6 @@ ALL_FUEL_TYPES = {
     "H2": "Hydrogen",
     "CNG": "CNG/NGV",
 }
-CHEAPEST_FUEL_TYPES = ("E10", "U91")  # Hardcode for now, maybe make user selectable
 CHEAPEST_RESULTS_LIMIT = 5
 CONF_FUEL_TYPE = "fuel_type"
 CONF_LOCATION = "location"
@@ -30,7 +29,7 @@ DEFAULT_FUEL_TYPE = "E10-U91"  # Some fuel types in TAS return NSW stations!
 DEFAULT_FUEL_TYPE_NON_E10 = "U91"
 DEFAULT_NICKNAME = "Home"
 DEFAULT_RADIUS_KM = 25  # km
-DEFAULT_SCAN_INTERVAL = datetime.timedelta(minutes=720) # It can be days between price changes
+DEFAULT_SCAN_INTERVAL = datetime.timedelta(minutes=5) # It can be days between price changes
 E10_AVAILABLE_STATES: tuple[str, ...] = ("NSW",)
 E10_CODE = "E10"
 LAT_CAMERON_CORNER_BOUND = -28.99608
@@ -40,4 +39,3 @@ LON_SE_BOUND = 154
 LAT_TAS_BOUND = -39
 STATION_LIST_LIMIT = 35
 PRICE_UNIT = "¢/L"
-U91_CODE = "U91"
