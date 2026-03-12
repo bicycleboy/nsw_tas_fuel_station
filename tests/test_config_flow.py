@@ -10,19 +10,19 @@ from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from nsw_tas_fuel import NSWFuelApiClientAuthError, NSWFuelApiClientError
-from pytest_homeassistant_custom_component.common import MockConfigEntry
-
 from custom_components.nsw_tas_fuel_station.config_flow import (
     NSWFuelConfigFlow,
     _get_state_defaults,
     _split_combo_fuel_code,
 )
+
 from custom_components.nsw_tas_fuel_station.const import (
+    DOMAIN,
+    DEFAULT_FUEL_TYPE,
     CONF_LOCATION,
     CONF_NICKNAME,
-    DEFAULT_FUEL_TYPE,
-    DOMAIN,
 )
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from .conftest import (
     CLIENT_ID,
@@ -404,10 +404,10 @@ async def test_error_fetching_stations_in_advanced_options(
 ) -> None:
     """API errors during station lookup should redisplay the advanced form.
 
-     The error branch in async_step_advanced_options is exercised when
+    The error branch in async_step_advanced_options is exercised when
     _get_station_list returns a non-empty errors dict.  This test
-     forces the underlying API call to raise NSWFuelApiClientError which is
-     translated into a connection error key.
+    forces the underlying API call to raise NSWFuelApiClientError which is
+    translated into a connection error key.
     """
     # use the normal mock_api_client fixture but override its radius method so
     # the first invocation returns a real result and the second raises an error.
@@ -1027,7 +1027,6 @@ def test_validate_location_raises_for_invalid_inputs(
 async def test_get_station_list_api_not_initialized(hass: HomeAssistant) -> None:
     """If the API client is not initialized, _get_station_list raises HomeAssistantError."""
     from homeassistant.exceptions import HomeAssistantError
-
     from custom_components.nsw_tas_fuel_station.config_flow import NSWFuelConfigFlow
 
     flow = NSWFuelConfigFlow()
