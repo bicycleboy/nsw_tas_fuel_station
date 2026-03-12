@@ -6,18 +6,16 @@ import logging
 import re
 from typing import TYPE_CHECKING, Any, cast
 
-from nsw_tas_fuel import (
-    NSWFuelApiClient,
-    NSWFuelApiClientAuthError,
-    NSWFuelApiClientError,
-)
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
-
+from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlow
 from homeassistant.const import CONF_CLIENT_ID, CONF_CLIENT_SECRET
+from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
-import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers.aiohttp_client import (
+    async_get_clientsession,
+)
 from homeassistant.helpers.selector import (
     LocationSelector,
     LocationSelectorConfig,
@@ -29,11 +27,15 @@ from homeassistant.helpers.selector import (
     TextSelectorConfig,
     TextSelectorType,
 )
-from homeassistant.helpers.translation import async_get_translations
-from homeassistant.util import slugify
+from nsw_tas_fuel import (
+    NSWFuelApiClient,
+    NSWFuelApiClientAuthError,
+    NSWFuelApiClientError,
+)
 
 from .const import (
     ALL_FUEL_TYPES,
+    CONF_AU_STATE,
     CONF_FUEL_TYPE,
     CONF_LOCATION,
     CONF_NICKNAME,
@@ -45,18 +47,15 @@ from .const import (
     DOMAIN,
     LAT_CAMERON_CORNER_BOUND,
     LAT_SE_BOUND,
-    LAT_TAS_BOUND,
+    LAT_TAS_N_BOUND,
     LON_CAMERON_CORNER_BOUND,
     LON_SE_BOUND,
     STATION_LIST_LIMIT,
 )
-
 from .coordinator import state_default_fuel
 
 if TYPE_CHECKING:
     from nsw_tas_fuel.client import StationPrice
-
-    from homeassistant import config_entries
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -73,21 +72,25 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         """Init Config Flow."""
         self._flow_data: dict[str, Any] = {}
-        self._last_form: dict[str, Any] | None = None
+        self._last_form: dict[str, Any] = {}
         self._nearby_station_prices: list[StationPrice] = []
         self._station_lookup: dict[int, dict[str, Any]] = {}
         self.api: NSWFuelApiClient | None = None
+        self._config_entry: config_entries.ConfigEntry | None = None
+
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Step 1 - Prompt for API credentials.
+    ) -> FlowResult:
+        """No options, just verify credentials and a list of stations near home zone.
 
-        API call get_fuel_prices_within_radius both validates credentials and gathers
-        list of stations for step 2.
-        The default path does not allow user to enter nickname or fuel type so
-        use default and don't validate.  Location defaults to HA Home Zone.
+        Validates:
+        - Account uniqueness (client_id)
+        - HA Home location within supported AU states
+        - API connectivity
+
         """
+
         errors: dict[str, str] = {}
 
         if user_input is None:
@@ -95,41 +98,41 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 step_id="user",
                 data_schema=self._build_user_schema(),
                 errors=errors,
-                last_step=False,
             )
 
         self._last_form = user_input
-        self._flow_data.update(user_input)
+        client_id = user_input[CONF_CLIENT_ID]
+        client_secret = user_input[CONF_CLIENT_SECRET]
 
-        if not self._flow_data.get(CONF_NICKNAME):
-            self._flow_data[CONF_NICKNAME] = DEFAULT_NICKNAME
+        await self.async_set_unique_id(client_id)
+        self._abort_if_unique_id_configured()
 
-        nickname = self._flow_data[CONF_NICKNAME]
+        nickname = DEFAULT_NICKNAME
 
-        # Create API client, allows invalid home zone to error to advanced path
-        session = async_create_clientsession(self.hass)
-        api = NSWFuelApiClient(
+        location = {
+            "latitude": getattr(self.hass.config, "latitude", None),
+            "longitude": getattr(self.hass.config, "longitude", None),
+        }
+
+        # Create the API client and store credentials before validating the location so we can error to advanced path
+        session = async_get_clientsession(self.hass)
+        self.api = NSWFuelApiClient(
             session=session,
-            client_id=self._flow_data[CONF_CLIENT_ID],
-            client_secret=self._flow_data[CONF_CLIENT_SECRET],
+            client_id=client_id,
+            client_secret=client_secret,
         )
+        self._flow_data.update({
+            CONF_CLIENT_ID: user_input[CONF_CLIENT_ID],
+            CONF_CLIENT_SECRET: user_input[CONF_CLIENT_SECRET],
+        })
 
-        self.api = api
-
-        location = self._flow_data.get(CONF_LOCATION)
-        if not isinstance(location, dict):
-            location = {
-                "latitude": getattr(self.hass.config, "latitude", None),
-                "longitude": getattr(self.hass.config, "longitude", None),
-            }
-            self._flow_data[CONF_LOCATION] = location
-
-        # Default Home zone may be outside NSW/ACT/TAS
+        # Validate HA Home location
         try:
-            lat, lon, au_state = self._validate_location(self._flow_data[CONF_LOCATION])
+            lat, lon, au_state = _validate_location(location)
         except ValueError as err:
             errors["base"] = str(err)
-            _LOGGER.debug("Invalid location: %s", err)
+            _LOGGER.debug("Invalid HA Home location: %s", err)
+
             return self.async_show_form(
                 step_id="advanced_options",
                 data_schema=self._build_advanced_options_schema(
@@ -138,326 +141,167 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 errors=errors,
             )
 
-        if not self._flow_data.get(CONF_FUEL_TYPE):
-            self._flow_data[CONF_FUEL_TYPE] = state_default_fuel(au_state)
+        fuel_type = state_default_fuel(au_state)
 
-        # Store metadata to save coordinator additional api calls
-        nicknames = self._flow_data.setdefault("nicknames", {})
-        nickname_data = nicknames.setdefault(nickname, {})
-        nickname_data["location"] = {"latitude": lat, "longitude": lon}
 
-        # First network API call in config flow
-        errors = await self._get_station_list(lat, lon, self._flow_data[CONF_FUEL_TYPE])
+        # First network API call: validates credentials + gathers nearby stations
+        errors = await self._get_station_list(
+            lat,
+            lon,
+            fuel_type,
+        )
+
         if errors:
             return self.async_show_form(
                 step_id="user",
-                data_schema=self._build_user_schema(self._last_form or self._flow_data),
+                data_schema=self._build_user_schema(self._last_form),
                 errors=errors,
             )
+
+        # Store state for next step
+        self._flow_data.update({
+            CONF_CLIENT_ID: client_id,
+            CONF_CLIENT_SECRET: client_secret,
+            CONF_NICKNAME: nickname,
+            CONF_AU_STATE: au_state,
+            CONF_FUEL_TYPE: fuel_type,
+            CONF_LOCATION: {
+                "latitude": lat,
+                "longitude": lon,
+            },
+        })
 
         return await self.async_step_station_select()
 
-    async def async_step_station_select(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Step 2 - allow user to select stations for a nickname/location.
 
-        This step entered either via default path or via advanced options.
-        Build or update a config entry for selected stations with
-        attributes required to create sensors without additional API calls.
-        In the advanced path we want the user to be able to add fuel types
-        to existing stations and stations to existing nicknames.
-        """
+    async def async_step_station_select(
+        self,
+        user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Present user with a list of nearby stations to select from and handle selection."""
+
         errors: dict[str, str] = {}
 
-        adv_label = await self._get_advanced_option_label()
-
-        # First time through we want to show the user "Find more stations..."
+        # Show form if user_input is not provided
         if user_input is None:
             return self.async_show_form(
                 step_id="station_select",
-                data_schema=self._build_station_schema(
-                    self._nearby_station_prices, advanced_label=adv_label
-                ),
+                data_schema=self._build_station_schema(self._nearby_station_prices),  # fix 2nd param to use self._nearby_station_prices
                 errors=errors,
             )
 
-        selected_codes_str = user_input.get(CONF_SELECTED_STATIONS, [])
-        self._last_form = user_input
+        nickname = self._flow_data.get(CONF_NICKNAME, DEFAULT_NICKNAME)
+        selected_fuel_code = self._flow_data.get(CONF_FUEL_TYPE)
 
-        # User selected "Find more..."
-        if selected_codes_str == ["__advanced__"]:
-            return await self.async_step_advanced_options()
+        # Convert selection to list of ints
+        selected_stations = [int(x) for x in user_input.get(CONF_SELECTED_STATIONS, [])]
 
-        # User selected stations *and* "Find more....", ignore "Find more..."
-        selected_codes_str = [
-            code for code in selected_codes_str if code != "__advanced__"
-        ]
-
-        selected_codes = [int(x) for x in selected_codes_str]
-
-        # User did not select anything
-        if not selected_codes:
+        if not selected_stations:
             errors["base"] = "no_stations"
             return self.async_show_form(
                 step_id="station_select",
-                data_schema=self._build_station_schema(
-                    self._nearby_station_prices,
-                    user_input=self._last_form,
-                    advanced_label="",
-                ),
+                data_schema=self._build_station_schema(self._nearby_station_prices),
                 errors=errors,
             )
 
-        #
-        # User selected stations, create or update config entry
-        #
+        # Save selection in flow state
         self._flow_data.update(user_input)
 
-        nickname = self._flow_data[CONF_NICKNAME]
-        selected_fuel_code = self._flow_data[CONF_FUEL_TYPE]
+        # Build station payload
+        stations_payload = [
+            {
+                "station_code": code,
+                "au_state": self._station_lookup[code]["au_state"],
+                "station_name": self._station_lookup[code]["station_name"],
+            }
+            for code in selected_stations
+        ]
 
-        updating_entry: config_entries.ConfigEntry | None = None
+        # Handle reconfigure: update existing entry
+        if self.source == config_entries.SOURCE_RECONFIGURE:
+            existing_data = self._config_entry.data
+            existing_nicknames = existing_data.get("nicknames", {})
 
-        for entry in self._async_current_entries():
-            if nickname in entry.data.get("nicknames", {}):
-                updating_entry = entry
-                break
+            if nickname not in existing_nicknames:
+                # Create new nickname block
+                new_data = _create_nickname_with_stations(
+                    existing_data,
+                    nickname,
+                    self._flow_data[CONF_LOCATION],
+                    stations_payload,
+                    selected_fuel_code,
+                )
+            else:
+                # Add stations if needed
+                new_data = _add_stations_to_nickname(existing_data, nickname, stations_payload)
+                # Add fuel type to those stations
+                new_data = _add_fuel_to_stations(new_data, nickname, stations_payload, selected_fuel_code)
 
-        if updating_entry is None:
-            return await self._create_new_config_entry(
-                nickname, selected_codes, selected_fuel_code
-            )
+                self.hass.config_entries.async_update_entry(self._config_entry, data=new_data)
+                return self.async_abort(reason="reconfigured")
 
-        return await self._update_existing_entry(
-            updating_entry,
-            nickname,
-            selected_codes,
-            selected_fuel_code,
-            self._nearby_station_prices,
+        # Create a new config entry (first-time setup)
+        return await self._create_new_config_entry(nickname, selected_stations)
+
+
+
+    async def async_step_reconfigure(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> FlowResult:
+        """Reconfigure an existing entry."""
+
+        self._config_entry = self.hass.config_entries.async_get_entry(
+            self.context["entry_id"]
         )
 
-    async def async_step_advanced_options(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Step 3 - optional advanced configuration.
+        if self._config_entry is None:
+            return self.async_abort(reason="unknown_entry")
 
-        - allow the user to enter non-default nickname, fuel, location.
-        - allow the user to create a new nickname to group stations.
-        - support the creation of "cheapest near ..." sensors.
-        - allow the user to add stations to an existing location.
-        - allow the user to add additional fuel types to existing stations
-        """
-        errors: dict[str, str] = {}
+        self._flow_data = dict(self._config_entry.data)
 
-        if user_input is None:
-            return self.async_show_form(
-                step_id="advanced_options",
-                data_schema=self._build_advanced_options_schema(),
-                errors=errors,
+        if self.api is None:
+            self.api = NSWFuelApiClient(
+                session=async_get_clientsession(self.hass),
+                client_id=self._config_entry.data[CONF_CLIENT_ID],
+                client_secret=self._config_entry.data[CONF_CLIENT_SECRET],
             )
 
-        self._last_form = user_input
+        return await self.async_step_advanced_options(user_input)
 
-        # "Cheapest near" sensors must be distinguishable to the user in the UI so the
-        # nickname is included in the sensor name/id, hence validate
-        nickname = user_input.get(CONF_NICKNAME, DEFAULT_NICKNAME)
-        if not nickname or not re.match(r"^[A-Za-z0-9_-]+$", nickname):
-            errors["nickname"] = "invalid_nickname"
-
-        if errors:
-            return self.async_show_form(
-                step_id="advanced_options",
-                data_schema=self._build_advanced_options_schema(
-                    self._last_form or self._flow_data
-                ),
-                errors=errors,
-            )
-
-        self._flow_data[CONF_NICKNAME] = nickname
-
-        # Locations outside NSW/TAS currently unsupported
-        try:
-            lat, lon, au_state = self._validate_location(user_input.get(CONF_LOCATION))
-        except ValueError as err:
-            errors["base"] = str(err)
-
-            return self.async_show_form(
-                step_id="advanced_options",
-                data_schema=self._build_advanced_options_schema(
-                    self._last_form or self._flow_data
-                ),
-                errors=errors,
-            )
-
-        # Schema ensures a valid fuel value
-        fuel_type = user_input.get(CONF_FUEL_TYPE)
-        self._flow_data[CONF_FUEL_TYPE] = fuel_type
-
-        # Save location in case user returns to advanced options
-        self._flow_data[CONF_LOCATION] = {"latitude": lat, "longitude": lon}
-
-        # Initialise nickname structure
-        nicknames = self._flow_data.setdefault("nicknames", {})
-        nickname_data = nicknames.setdefault(nickname, {})
-        nickname_data["location"] = {"latitude": lat, "longitude": lon}
-
-        # Network API call for neaby stations for user entered location & fuel type
-        # API results can be unexpected for fuel/location combinations
-        # debug logging may highlight API results vs bugs
-        errors = await self._get_station_list(lat, lon, fuel_type)
-
-        if errors:
-            return self.async_show_form(
-                step_id="advanced_options",
-                data_schema=self._build_advanced_options_schema(
-                    self._last_form or self._flow_data
-                ),
-                errors=errors,
-            )
-
-        return await self.async_step_station_select()
 
     async def _create_new_config_entry(
         self,
         nickname: str,
-        selected_codes: list[int],
-        selected_fuel_code: str,
-    ) -> config_entries.ConfigFlowResult:
+        selected_stations: list[int]
+    ) -> FlowResult:
         """Create a config entry for a new nickname.
 
         Store metadata from API to save coordinator additional API calls.
         In the default path, hardcode fuel types E10, U91
         """
-        unique_id = f"{DOMAIN}_{slugify(nickname)}"
-        await self.async_set_unique_id(unique_id)
-        self._abort_if_unique_id_configured()
-
-        nickname_data = self._flow_data["nicknames"][nickname]
 
         entry_data = {
             CONF_CLIENT_ID: self._flow_data[CONF_CLIENT_ID],
             CONF_CLIENT_SECRET: self._flow_data[CONF_CLIENT_SECRET],
             "nicknames": {
                 nickname: {
-                    "location": nickname_data["location"],
+                    "location": self._flow_data[CONF_LOCATION],
                     "stations": [
                         {
                             "station_code": code,
                             "au_state": self._station_lookup[code]["au_state"],
                             "station_name": self._station_lookup[code]["station_name"],
-                            "fuel_types": _split_combo_fuel_code(selected_fuel_code),
+                            "fuel_types": self._station_lookup[code]["fuel_types"]
                         }
-                        for code in selected_codes
+                        for code in selected_stations
                     ],
                 }
             },
         }
 
-        return self.async_create_entry(
-            title="NSW Fuel Check",
-            data=entry_data,
-        )
+        return self.async_create_entry(title="NSW Fuel Check", data=entry_data,)
 
-    async def _update_existing_entry(
-        self,
-        updating_entry: config_entries.ConfigEntry,
-        nickname: str,
-        selected_station_codes: list[int],
-        selected_fuel_code: str,
-        available_stations: list[StationPrice],
-    ) -> config_entries.ConfigFlowResult:
-        """Merge user selection with existing config entry.
-
-        Allows user to add stations to an existing nickname/location
-        or add additional fuel types to existing station.
-        """
-        existing_config_entry = dict(updating_entry.data)
-        config_entry_nicknames = dict(existing_config_entry.get("nicknames", {}))
-        existing_stations: list[dict] = config_entry_nicknames[nickname].get(
-            "stations", []
-        )
-        existing_sensors: set[tuple[int, str, str]] = set()
-
-        for st in existing_stations:
-            for ft in st.get("fuel_types", []):
-                existing_sensors.add((st["station_code"], st["au_state"], ft))
-
-            selected_fuels = _split_combo_fuel_code(selected_fuel_code)
-
-            # Alert user to existing sensor
-            for selected_station_code in selected_station_codes:
-                station_lookup = self._station_lookup[selected_station_code]
-
-                for fuel in selected_fuels:
-                    sensor_key = (
-                        selected_station_code,
-                        station_lookup["au_state"],
-                        fuel,
-                    )
-
-                    if sensor_key in existing_sensors:
-                        return self.async_show_form(
-                            step_id="station_select",
-                            data_schema=self._build_station_schema(
-                                available_stations,
-                                user_input=self._last_form,
-                                advanced_label=await self._get_advanced_option_label(),
-                            ),
-                            errors={"base": "sensor_exists"},
-                            description_placeholders={
-                                "station": station_lookup["station_name"],
-                                "fuel": fuel,
-                            },
-                        )
-
-        merged_stations_map: dict[tuple[int, str], dict[str, Any]] = {
-            (st["station_code"], st["au_state"]): dict(st) for st in existing_stations
-        }
-
-        # merge station to nickname or additional fuel to station
-        for selected_station_code in selected_station_codes:
-            station_lookup = self._station_lookup[selected_station_code]
-            station_state_key = (selected_station_code, station_lookup["au_state"])
-
-            if station_state_key in merged_stations_map:
-                fuels = set(
-                    merged_stations_map[station_state_key].get("fuel_types", [])
-                )
-
-                fuels.update(_split_combo_fuel_code(selected_fuel_code))
-                merged_stations_map[station_state_key]["fuel_types"] = sorted(fuels)
-            else:
-                merged_stations_map[station_state_key] = {
-                    "station_code": selected_station_code,
-                    "au_state": station_lookup["au_state"],
-                    "station_name": station_lookup["station_name"],
-                    "fuel_types": _split_combo_fuel_code(selected_fuel_code),
-                }
-
-        merged_stations = list(merged_stations_map.values())
-
-        # Update the nickname with merged stations
-        # Location may be updated so cheapest sensors will be
-        # updated based on last selected location
-        nick_location = self._flow_data.get("nicknames", {}).get(nickname, {}).get(
-            "location"
-        ) or config_entry_nicknames.get(nickname, {}).get("location")
-
-        config_entry_nicknames[nickname] = {
-            "location": nick_location,
-            "stations": merged_stations,
-        }
-
-        new_data = {
-            CONF_CLIENT_ID: existing_config_entry[CONF_CLIENT_ID],
-            CONF_CLIENT_SECRET: existing_config_entry[CONF_CLIENT_SECRET],
-            "nicknames": config_entry_nicknames,
-        }
-
-        self.hass.config_entries.async_update_entry(updating_entry, data=new_data)
-
-        return self.async_abort(reason="updated_existing")
 
     def _build_user_schema(
         self, user_input: dict[str, Any] | None = None
@@ -484,28 +328,78 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return self.add_suggested_values_to_schema(schema, config_entry)
 
+
+    async def async_step_advanced_options(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Step 1 of OptionsFlow: choose nickname, location and fuel."""
+        errors: dict[str, str] = {}
+
+        if user_input is None:
+            return self.async_show_form(
+                    step_id="advanced_options",
+                    data_schema=self._build_advanced_options_schema(self._flow_data),
+                    errors=errors,
+                )
+
+        # Nickname used in sensor names so validate
+        nickname = user_input.get(CONF_NICKNAME)
+        if not nickname or not re.match(r"^[A-Za-z0-9_ -]+$", nickname):
+            errors["nickname"] = "invalid_nickname"
+
+        # Only NSW/ACT/TAS supported
+        try:
+            lat, lon, au_state = _validate_location(
+                user_input.get(CONF_LOCATION)
+            )
+        except ValueError as err:
+            errors["base"] = str(err)
+
+        # Schema ensures validity)
+        fuel_type = user_input.get(CONF_FUEL_TYPE)
+
+        if errors:
+            return self.async_show_form(
+                step_id="advanced_options",
+                data_schema=self._build_advanced_options_schema(user_input),
+                errors=errors,
+            )
+
+        self._flow_data.update({
+            CONF_NICKNAME: nickname,
+            CONF_LOCATION: {"latitude": lat, "longitude": lon},
+            CONF_AU_STATE: au_state,
+            CONF_FUEL_TYPE: fuel_type,
+        })
+
+        # Network API call
+        errors = await self._get_station_list(lat, lon, fuel_type)
+        if errors:
+            return self.async_show_form(
+                step_id="advanced_options",
+                data_schema=self._build_advanced_options_schema(user_input),
+                errors=errors,
+            )
+
+        return await self.async_step_station_select()
+
     def _build_station_schema(
         self,
         stations: list[StationPrice],
-        user_input: dict[str, Any] | None = None,
-        advanced_label: str = "...",
     ) -> vol.Schema:
         """Build config flow UI schema for the station selection list/dropdown."""
-        user = user_input or self._flow_data
 
-        # In absence of "advanced options" button, add "Find more stations..." to list
+        selected = self._flow_data.get(CONF_SELECTED_STATIONS, [])
+
         options: list[SelectOptionDict] = [
-            cast(SelectOptionDict, {"value": "__advanced__", "label": advanced_label}),
-            *[
-                cast(
-                    SelectOptionDict,
-                    {
-                        "value": str(sp.station.code),
-                        "label": _format_station_option(sp),
-                    },
-                )
-                for sp in stations
-            ],
+            cast(
+                SelectOptionDict,
+                {
+                    "value": str(sp.station.code),
+                    "label": _format_station_option(sp),
+                },
+            )
+            for sp in stations
         ]
 
         select_selector = SelectSelector(
@@ -521,10 +415,12 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             {
                 vol.Required(
                     CONF_SELECTED_STATIONS,
-                    default=user.get(CONF_SELECTED_STATIONS, []),
+                    default=selected,
                 ): select_selector,
             }
         )
+
+
 
     def _build_advanced_options_schema(
         self,
@@ -540,80 +436,53 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             or DEFAULT_NICKNAME
         )
 
-        try:
-            suggested_location = self._flow_data.get(CONF_LOCATION)
 
-            if not suggested_location:
-                suggested_location = {
-                    "latitude": getattr(self.hass.config, "latitude", None),
-                    "longitude": getattr(self.hass.config, "longitude", None),
-                }
+        suggested_location = self._flow_data.get(CONF_LOCATION)
 
-            suggested_fuel, fuel_types = _get_state_defaults(suggested_location)
-            return vol.Schema(
-                {
-                    vol.Required(
-                        CONF_NICKNAME,
-                        default=nickname,
-                        # "suggested" will also remind user of invalid nickname entered
-                        description={"suggested_value": nickname},
-                    ): TextSelector(),
-                    vol.Required(
-                        CONF_LOCATION,
-                        default=suggested_location,
-                        description={"suggested_value": suggested_location},
-                    ): LocationSelector(
-                        LocationSelectorConfig(
-                            radius=False,
-                        )
-                    ),
-                    vol.Required(
-                        CONF_FUEL_TYPE,
-                        default=suggested_fuel,
-                    ): SelectSelector(
-                        SelectSelectorConfig(
-                            options=[
-                                SelectOptionDict(
-                                    value=code,
-                                    label=name,
-                                )
-                                for code, name in fuel_types
-                            ],
-                            multiple=False,
-                            sort=False,
-                            mode=SelectSelectorMode.DROPDOWN,
-                        )
-                    ),
-                }
-            )
-        except Exception as e:
-            _LOGGER.debug("Exception in _build_advanced_options_schema: %s", e)
-            raise
+        if not suggested_location:
+            suggested_location = {
+                "latitude": getattr(self.hass.config, "latitude", None),
+                "longitude": getattr(self.hass.config, "longitude", None),
+            }
 
-    def _validate_location(
-        self, location: dict[str, Any] | None
-    ) -> tuple[float, float, str]:
-        """Return lat & long if valid and roughly within NSW/TAS or raise ValueError."""
-        if location is None or not isinstance(location, dict):
-            msg = "invalid_coordinates"
-            raise ValueError(msg)
-        try:
-            lat = cv.latitude(location["latitude"])
-            lon = cv.longitude(location["longitude"])
-        except Exception as err:
-            msg = "invalid_coordinates"
-            raise ValueError(msg) from err
+        suggested_fuel, fuel_types = _get_state_defaults(suggested_location)
+        return vol.Schema(
+            {
+                vol.Required(
+                    CONF_NICKNAME,
 
-        if not (LAT_SE_BOUND <= lat <= LAT_CAMERON_CORNER_BOUND) or not (
-            LON_CAMERON_CORNER_BOUND <= lon <= LON_SE_BOUND
-        ):
-            msg = "invalid_coordinates"
-            raise ValueError(msg)
+                    # "suggested" will also remind user of invalid nickname entered
+                    description={"suggested_value": nickname},
+                ): TextSelector(),
+                vol.Required(
+                    CONF_LOCATION,
+                    default=suggested_location,
+                    description={"suggested_value": suggested_location},
+                ): LocationSelector(
+                    LocationSelectorConfig(
+                        radius=False,
+                    )
+                ),
+                vol.Required(
+                    CONF_FUEL_TYPE,
+                    default=suggested_fuel,
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=[
+                            SelectOptionDict(
+                                value=code,
+                                label=name,
+                            )
+                            for code, name in fuel_types
+                        ],
+                        multiple=False,
+                        sort=False,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+            }
+        )
 
-        # Hardcode basic latitude test for now
-        au_state = "TAS" if lat < LAT_TAS_BOUND else "NSW"
-
-        return lat, lon, au_state
 
     async def _get_station_list(
         self,
@@ -625,7 +494,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         The API appears to balance price/distance regardless of
         the sort by setting.
-        U91 returns the most reliable/sensible results for "nearby".
+        In NSW E10-U91 returns the most reliable/sensible results for "cheap nearby".
         """
         errors = {}
 
@@ -642,28 +511,33 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
             # E10-U91 returns multiple rows per station
             seen: set[str] = set()
-            unique_prices = []
+            unique_prices: list[StationPrice] = []
+
+            self._station_lookup = {}
+
             for sp in nearby:
-                station_code = sp.station.code
+                st = sp.station
+                fuel = sp.price.fuel_type
+                code = st.code
 
-                if station_code in seen:
-                    continue
+                # Build station lookup with all fuel types
+                if code not in self._station_lookup:
+                    self._station_lookup[code] = {
+                        "station_code": code,
+                        "station_name": st.name,
+                        "au_state": st.au_state,
+                        "fuel_types": [],
+                    }
 
-                seen.add(station_code)
-                unique_prices.append(sp)
+                if fuel not in self._station_lookup[code]["fuel_types"]:
+                    self._station_lookup[code]["fuel_types"].append(fuel)
+
+                # Only keep the first StationPrice per station for display list
+                if code not in seen:
+                    seen.add(code)
+                    unique_prices.append(sp)
 
             self._nearby_station_prices = unique_prices[:STATION_LIST_LIMIT]
-
-            # Build station lookup by station code
-            self._station_lookup = {}
-            for sp in self._nearby_station_prices:
-                st = sp.station
-
-                self._station_lookup[st.code] = {
-                    "station_code": st.code,
-                    "station_name": st.name,
-                    "au_state": st.au_state,
-                }
 
         except NSWFuelApiClientAuthError:
             errors["base"] = "auth"
@@ -672,17 +546,151 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return errors
 
-    async def _get_advanced_option_label(self) -> str:
-        """Return the locale language text for the advanced option."""
-        key = f"component.{DOMAIN}.config.step.station_select.data.advanced_option"
-        translations = await async_get_translations(
-            self.hass,
-            self.hass.config.language,
-            "config",
-            {DOMAIN},
-        )
-        return translations.get(key) or "More stations..."
 
+def _create_nickname_with_stations(
+    data: dict,
+    nickname: str,
+    location: dict,
+    stations: list[dict],
+    fuel_code: str,
+) -> dict:
+    """Create a brand new nickname block with stations and fuel.
+
+    Assumes nickname does NOT already exist.
+    """
+
+    new_data = dict(data)
+    nicknames = dict(new_data.get("nicknames", {}))
+
+    if nickname in nicknames:
+        raise ValueError("Nickname already exists")
+
+    nicknames[nickname] = {
+        "location": location,
+        "stations": [
+            {
+                "station_code": s["station_code"],
+                "station_name": s["station_name"],
+                "au_state": s["au_state"],
+                "fuel_types": _split_combo_fuel_code(fuel_code),
+            }
+            for s in stations
+        ],
+    }
+
+    new_data["nicknames"] = nicknames
+    return new_data
+
+
+def _add_stations_to_nickname(
+    data: dict,
+    nickname: str,
+    stations: list[dict],
+) -> dict:
+    """Add stations to an existing nickname."""
+
+    new_data = dict(data)
+    nicknames = dict(new_data.get("nicknames", {}))
+
+    if nickname not in nicknames:
+        raise ValueError("Nickname does not exist")
+
+    nickname_block = dict(nicknames[nickname])
+    existing_stations = list(nickname_block.get("stations", []))
+
+    station_index = {
+        (s["station_code"], s["au_state"]): s
+        for s in existing_stations
+    }
+
+    for station in stations:
+        key = (station["station_code"], station["au_state"])
+
+        if key not in station_index:
+            existing_stations.append(
+                {
+                    "station_code": station["station_code"],
+                    "au_state": station["au_state"],
+                    "station_name": station["station_name"],
+                    "fuel_types": [],
+                }
+            )
+
+    nickname_block["stations"] = existing_stations
+    nicknames[nickname] = nickname_block
+    new_data["nicknames"] = nicknames
+
+    return new_data
+
+def _add_fuel_to_stations(
+    data: dict,
+    nickname: str,
+    stations: list[dict],
+    fuel_code: str,
+) -> dict:
+    """Add fuel type to stations."""
+
+    new_data = dict(data)
+    nicknames = dict(new_data.get("nicknames", {}))
+
+    if nickname not in nicknames:
+        raise ValueError("Nickname does not exist")
+
+    nickname_block = dict(nicknames[nickname])
+    existing_stations = list(nickname_block.get("stations", []))
+
+    station_index = {
+        (s["station_code"], s["au_state"]): s
+        for s in existing_stations
+    }
+
+    new_fuel_codes = _split_combo_fuel_code(fuel_code)
+
+    for station in stations:
+        key = (station["station_code"], station["au_state"])
+
+        if key not in station_index:
+            continue
+
+        existing = dict(station_index[key])
+
+        fuels = set(existing.get("fuel_types", []))
+        fuels.update(new_fuel_codes)
+
+        existing["fuel_types"] = sorted(fuels)
+
+        station_index[key] = existing
+
+    nickname_block["stations"] = list(station_index.values())
+    nicknames[nickname] = nickname_block
+    new_data["nicknames"] = nicknames
+
+    return new_data
+
+
+def _validate_location(location: dict[str, Any] | None
+) -> tuple[float, float, str]:
+    """Return lat & long if valid and roughly within NSW/TAS or raise ValueError."""
+    if location is None or not isinstance(location, dict):
+        msg = "invalid_coordinates"
+        raise ValueError(msg)
+    try:
+        lat = cv.latitude(location["latitude"])
+        lon = cv.longitude(location["longitude"])
+    except Exception as err:
+        msg = "invalid_coordinates"
+        raise ValueError(msg) from err
+
+    if not (LAT_SE_BOUND <= lat <= LAT_CAMERON_CORNER_BOUND) or not (
+        LON_CAMERON_CORNER_BOUND <= lon <= LON_SE_BOUND
+    ):
+        msg = "invalid_coordinates"
+        raise ValueError(msg)
+
+    # Hardcode basic latitude test for now
+    au_state = "TAS" if lat < LAT_TAS_N_BOUND else "NSW"
+
+    return lat, lon, au_state
 
 def _format_station_option(sp: StationPrice) -> str:
     """Return a user-friendly station label for the UI.
@@ -691,20 +699,6 @@ def _format_station_option(sp: StationPrice) -> str:
     """
     st = sp.station
     return f"{st.name} - {st.address} ({st.code})"
-
-
-def _split_combo_fuel_code(selected_fuel_code: str | None) -> list[str]:
-    """Convert a fuel code string (e.g., 'E10-U91') into a list of fuels.
-
-    The API returns the best results in NSW with E10-U91 so need special handling
-
-    Returns:
-        List of individual fuel codes, e.g. ['E10', 'U91'].
-        If input is None or empty, returns an empty list.
-    """
-    if not selected_fuel_code:
-        return []
-    return [fuel.strip() for fuel in selected_fuel_code.split("-") if fuel.strip()]
 
 
 def _get_state_defaults(
@@ -725,10 +719,23 @@ def _get_state_defaults(
     latitude = suggested_location.get("latitude")
 
     # NSW supports combo codes, since we only support 2 states, just use lat for now
-    if latitude is not None and latitude >= LAT_TAS_BOUND:
+    if latitude is not None and latitude >= LAT_TAS_N_BOUND:
         return DEFAULT_FUEL_TYPE, list(ALL_FUEL_TYPES.items())
 
     # TAS default to U91
     return DEFAULT_FUEL_TYPE_NON_E10, [
         (code, name) for code, name in ALL_FUEL_TYPES.items() if "-" not in code
     ]
+
+def _split_combo_fuel_code(selected_fuel_code: str | None) -> list[str]:
+    """Convert a fuel code string (e.g., 'E10-U91') into a list of fuels.
+
+    The API returns the best results in NSW with E10-U91 so need special handling
+
+    Returns:
+        List of individual fuel codes, e.g. ['E10', 'U91'].
+        If input is None or empty, returns an empty list.
+    """
+    if not selected_fuel_code:
+        return []
+    return [fuel.strip() for fuel in selected_fuel_code.split("-") if fuel.strip()]
