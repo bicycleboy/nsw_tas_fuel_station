@@ -2,5 +2,5 @@
 
 pkill hass
 cd /workspaces/ha-custom
-sleep 1
+sleep 2
 hass -c config&
