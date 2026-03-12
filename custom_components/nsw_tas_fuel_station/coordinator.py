@@ -202,7 +202,7 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
             combined = list(deduped.values())
 
-            # API results shoud already be sorted but in case
+            # API results should already be sorted but in case
             combined.sort(key=lambda x: x["price"])
 
             # Currently only have 2 sensors but might want more or debug info
