@@ -1,4 +1,5 @@
 """Constants for NSW Fuel Check Integration."""
+
 import datetime
 
 DOMAIN = "nsw_tas_fuel_station"
@@ -30,7 +31,9 @@ DEFAULT_FUEL_TYPE = "E10-U91"  # Some fuel types in TAS return NSW stations!
 DEFAULT_FUEL_TYPE_NON_E10 = "U91"
 DEFAULT_NICKNAME = "Home"
 DEFAULT_RADIUS_KM = 25  # km
-DEFAULT_SCAN_INTERVAL = datetime.timedelta(minutes=720) # It can be days between price changes
+DEFAULT_SCAN_INTERVAL = datetime.timedelta(
+    minutes=720
+)  # It can be days between price changes
 E10_AVAILABLE_STATES: tuple[str, ...] = ("NSW",)
 E10_CODE = "E10"
 LAT_CAMERON_CORNER_BOUND = -28.99608

@@ -146,12 +146,13 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
                         "station_name": str,
                         "au_state": str,
                         "fuel_type": str,
-                        "last_updated": datetime,
+                        "last_updated": str,
                     },
                     ...
                 ]
             }
         """
+
         cheapest: dict[str, list[dict]] = {}
 
         for nickname, nickname_attr in self._cheapest_lookup.items():
@@ -160,7 +161,7 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
             au_state = nickname_attr["au_state"]
 
             if lat is None or lon is None:
-                _LOGGER.error("Nickname '%s' missing lat/lon, skipping", nickname)
+                _LOGGER.warning("Nickname '%s' missing lat/lon, skipping", nickname)
                 continue
 
             fuel_type = state_default_fuel(au_state)
@@ -176,8 +177,19 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 _LOGGER.warning("No prices returned for %s", nickname)
                 continue
 
-            def _convert(sp: StationPrice) -> dict:
-                return {
+            # Track cheapest StationPrice per station
+            cheapest_per_station: dict[int, StationPrice] = {}
+
+            for sp in nearby:
+                code = sp.station.code
+                existing = cheapest_per_station.get(code)
+
+                if existing is None or sp.price.price < existing.price.price:
+                    cheapest_per_station[code] = sp
+
+            # Convert only the winners
+            combined: list[dict] = [
+                {
                     "price": sp.price.price,
                     "station_code": sp.station.code,
                     "station_name": sp.station.name,
@@ -185,27 +197,19 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
                     "fuel_type": sp.price.fuel_type,
                     "last_updated": sp.price.last_updated,
                 }
+                for sp in cheapest_per_station.values()
+            ]
 
-
-            converted = [_convert(sp) for sp in nearby]
-            deduped: dict[int, dict] = {}
-
-            for entry in converted:
-                code = entry["station_code"]
-
-                if code not in deduped:
-                    deduped[code] = entry
-                else:
-                    # Ensure we return cheapest stations vs 1 station with multiple cheap fuels
-                    if entry["price"] < deduped[code]["price"]:
-                        deduped[code] = entry
-
-            combined = list(deduped.values())
-
-            # API results should already be sorted but in case
             combined.sort(key=lambda x: x["price"])
 
-            # Currently only have 2 sensors but might want more or debug info
+            if len(combined) == 1:
+                _LOGGER.warning(
+                    "For nickname %s, NSW Fuel API returned only one station for lat=%s lon=%s. Try changing the location.",
+                    nickname,
+                    lat,
+                    lon,
+                )
+
             cheapest[nickname] = combined[:CHEAPEST_RESULTS_LIMIT]
 
         return cheapest

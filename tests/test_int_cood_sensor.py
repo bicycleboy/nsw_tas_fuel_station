@@ -23,6 +23,7 @@ from custom_components.nsw_tas_fuel_station.sensor import (
 
 _LOGGER = logging.getLogger(__name__)
 
+
 @pytest.fixture
 def nickname_home() -> dict:
     """Single NSW nickname."""

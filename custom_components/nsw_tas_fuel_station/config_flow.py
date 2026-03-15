@@ -180,7 +180,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return await self.async_step_station_select()
 
-
     async def async_step_station_select(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
@@ -246,7 +245,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
 
         return await self._create_new_config_entry(nickname, selected_stations)
 
-
     async def async_step_reconfigure(
         self,
         user_input: dict[str, Any] | None = None,
@@ -277,7 +275,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
         return await self.async_step_advanced_options(user_input)
-
 
     async def _create_new_config_entry(
         self, nickname: str, selected_stations: list[int]
@@ -311,7 +308,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             data=entry,
         )
 
-
     def _build_user_schema(
         self, user_input: dict[str, Any] | None = None
     ) -> vol.Schema:
@@ -336,7 +332,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 config_entry = entries[0].data
 
         return self.add_suggested_values_to_schema(schema, config_entry)
-
 
     def _build_station_schema(
         self,
@@ -373,7 +368,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 ): select_selector,
             }
         )
-
 
     async def async_step_advanced_options(
         self, user_input: dict[str, Any] | None = None
@@ -439,7 +433,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             )
 
         return await self.async_step_station_select()
-
 
     def _build_advanced_options_schema(
         self,
@@ -513,7 +506,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 ),
             }
         )
-
 
     async def _get_station_list(
         self,

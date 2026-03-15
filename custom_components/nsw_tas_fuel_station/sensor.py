@@ -203,7 +203,7 @@ class CheapestFuelPriceSensor(CoordinatorEntity[NSWFuelCoordinator], SensorEntit
             "fuel_type": station_price["fuel_type"],
             "price": station_price["price"],
             "price_last_changed": station_price.get("last_updated"),
-            "price_last_checked": datetime.now().strftime("%d %b %H:%M")
+            "price_last_checked": datetime.now().strftime("%d %b %H:%M"),
         }
 
 
