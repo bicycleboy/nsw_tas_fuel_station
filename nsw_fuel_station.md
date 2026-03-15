@@ -6,7 +6,7 @@ ha_release: 2026.5
 ha_iot_class: Cloud Polling
 ha_codeowners:
   - '@bicycleboy'
-ha_domain: nsw_fuel_station
+ha_domain: nsw_tas_fuel_station
 ha_integration_type: hub
 related:
   - url: https://github.com/bicycleboy/nsw_fuel_tas_station
@@ -27,7 +27,7 @@ Like weather integrations, the idea is not to replace the NSW Fuel Check App but
 
 1. Live or travel in NSW, the ACT or Tasmania.
 2. Visit api.nsw.gov.au.
-3. Subscribe to the FuelCheck API and create an app to obtain your API Key and Secret. Signup is free. The site requires an email addreess but does not spam you.  When prompted to create and name your app it can have any name.  Make a note of the API Key and API Secret.
+3. Subscribe to the FuelCheck API and create an app to obtain your API Key and Secret. Signup is free. The site requires an email address but does not spam you.  When prompted to create and name your app it can have any name.  Make a note of the API Key and API Secret.
 
 ![API Signup](./images/api_signup.png)
 
@@ -39,7 +39,7 @@ sensor:
   - platform: nsw_fuel_station
     station_id: 18813
 ```
-Sensor names will remain the same so there should be no need to delete dashboard cards.
+Sensor names will be similar but with a new prefix so dashboard cards will need updating.
 
 # Installation
 Currently this is a custom integrtation, see [the readme](./README.md) for installation details.
@@ -58,11 +58,11 @@ Once you have validated your key and secret you will be prompted to select fuel 
 
 Select one or more stations.
 
-Sensors will be created for each station you select.  In NSW and the ACT a sensor will be created for Ethanol E10 and another sensor for Unleaded U91. You can disable sensors not available or not of interest to you.  In Tasmania by default only an Unleaded U91 sensor is created. Selected stations assumes we are creatures of habit and typically fill up at stations that are often the cheapest near us.
+Sensors will be created for each station you select.  In NSW and the ACT the default search is for Ethanol E10 and Unleaded U91. In Tasmania by default search is for Unleaded U91. Selected stations assumes we are creatures of habit and typically fill up at our favorite stations that are often the cheapest near us.
 
 Click Submit.
 
-## Adding Sensors to Your Dashboad
+## Adding Sensors to Your Dashboard
 
 #### Selected Stations
 
@@ -79,7 +79,7 @@ The NSW Fuel Check API returns a balance between cheapest fuel and distance from
 
 ![cheapest stations](./images/tile_card_find_cheapest_sensor.png)
 
-The **tile card** is a good choice for the cheapest sensors as the tile card provides access to the additional attributes of these sensors.  In the tile card configuration under the **Content - State Content** heading, use the **Add** button to add **Station name**, **Fuel type**, and **State**.  You may want to include Last Changed.
+The **tile card** is a good choice for the cheapest sensors as the tile card provides access to the additional attributes of these sensors.  In the tile card configuration under the **Content - State Content** heading, use the **Add** button to add **Station name**, **Fuel type**, and **State**.  You may want to include Last Changed which is when the API reports the fuel price was last updated.
 
 ![add state](./images/tile_card_add_state_content.png)
 
@@ -91,9 +91,9 @@ The sensor card and glance card may also suit your dashboard, note that not all 
 
 ![example cards](./images/example_cards.png)
 
-## Advanced options
+## Advanced options / Reconfigure
 
-When first presented with the select stations screen you can choose **"Find more stations..."** then **Submit** to enter the Advanced Selection screen.   Here you can select the following options:
+Having created sensors for near your home, on the integration page you can use the **Reconfigure** option to enter the advanced configuration.   Here you can select the following options:
 
 
 Location Nickname:
@@ -102,16 +102,17 @@ A name to group your sensors under.  For example "Home" or "Work".  Accept the d
 
 Location:
 
-description: Use the location selector to choose another location.
+Use the location selector to choose another location.  Foe example if you have changed the nickname to "Work" change the location accordingly.  You can also change the location for an existing nickname such as "Home" if you want a sensor for a station that is not currently listed.
 
 Fuel Type:
 
-Pick a fuel type to see a list of stations stocking that fuel type.
-
+Pick a fuel type to see a list of stations stocking that fuel type.  If, for example you only care about Diesel, you can create Diesel sensors and disable other sensors.
 
 On Submit you will return to the Select Stations screen where there will be a list of stations for the location you entered and/or which carry the fuel you selected.
 
-If you leave the Home nickname in the nickname field or enter another existing nickname sensors for additional stations or additional fuel types can be added to that nickname.
+You can add fuel types to an existing station.
+
+You can also add stations to an existing nickname.
 
 You can change the location associated with an existing nickname, for example to group stations under "trip to work", however, currently only the last location set will be used for the "Cheapest \[*nickname*\] #1/2" sensors.
 
@@ -128,23 +129,25 @@ Selecting less common fuel types may produce unexpected results, e.g. NSW statio
 
 # Troubleshooting
 
-## I cannot see the station with the cheapest price
+## I cannot see the station name with the cheapest price, only "Cheapest Home 1"
 
 #### Description
 
-Most lovelace cards do not support the required additional attributes.
+Most lovelace cards do not support the required additional attributes which hold the station name.
 
 #### Resolution
 
 Use a tile card as described under **Cheapest Stations** above.
 
-## My E10 sensor is unavailable
+## My Cheapest Home 2 sensor is unavailable
 
 #### Description
 
-The integration currently assumes all NSW stations stock E10 and all stations stock U91.
+No price is shown, only unavailable for the 2nd cheapest sensor.
 
 #### Resolution
+
+In rural areas the NSW Fuel Check API may only return 1 station.  Try changing the location for the nickname repeatedly until you get a useful list of stations, these will likely be the stations that are "surveyed" for the cheapest fuel. 
 
 If a sensor consistently shows as unavailable you can disable the sensor using [Settings > Devices & services > Entities ](https://www.home-assistant.io/docs/configuration/customizing-devices/).
 
