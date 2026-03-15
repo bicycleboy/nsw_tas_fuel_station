@@ -102,6 +102,7 @@ async def test_successful_config_flow(
         await hass.async_block_till_done()
         entries = hass.config_entries.async_entries(DOMAIN)
         assert len(entries) == 1
+        assert entries[0].unique_id == CLIENT_ID
 
 
 @pytest.mark.parametrize(
