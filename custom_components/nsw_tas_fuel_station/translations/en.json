@@ -38,8 +38,8 @@
     "abort": {
       "already_configured": "The NSW Fuel Check integration is already set up.",
       "no_available_stations": "Either you have already configured all nearby stations or try Add Service again with a different location.",
+      "nickname_created": "Successfully created new nickname/location with selected stations.",
       "reconfigured": "Successfully added station(s) to existing nickname/location, or fuel to existing station."
-
     }
   }
 }

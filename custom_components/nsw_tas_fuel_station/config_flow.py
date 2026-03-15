@@ -230,6 +230,10 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                     self._flow_data[CONF_LOCATION],
                     stations_config_entry,
                 )
+                self.hass.config_entries.async_update_entry(
+                    self._config_entry, data=new_config_entry
+                )
+                return self.async_abort(reason="nickname_created")
             else:
                 new_config_entry = _add_stations_to_nickname(
                     existing_config_entry, nickname, stations_config_entry

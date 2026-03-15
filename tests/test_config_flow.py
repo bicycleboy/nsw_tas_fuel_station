@@ -105,13 +105,14 @@ async def test_successful_config_flow(
 
 
 @pytest.mark.parametrize(
-    ("existing", "select", "fuel", "expected"),
+    ("existing", "select", "fuel", "expected", "expected_reason"),
     [
         pytest.param(
             {},
             [STATION_NSW_A],
             None,
             {STATION_NSW_A: ["E10", "U91"]},
+            "nickname_created",
             id="new-nickname",
         ),
         pytest.param(
@@ -119,6 +120,7 @@ async def test_successful_config_flow(
             [STATION_NSW_B],
             None,
             {STATION_NSW_B: ["U91"]},
+            "nickname_created",
             id="new-nickname-combo-observed-fuels",
         ),
         pytest.param(
@@ -143,6 +145,7 @@ async def test_successful_config_flow(
                 STATION_NSW_A: ["E10", "U91"],
                 STATION_NSW_B: ["U91"],
             },
+            "reconfigured",
             id="add-station",
         ),
         pytest.param(
@@ -173,6 +176,7 @@ async def test_successful_config_flow(
                 STATION_NSW_A: ["DL", "E10"],
                 STATION_NSW_B: ["U91"],
             },
+            "reconfigured",
             id="add-fuel-multi",
         ),
     ],
@@ -184,6 +188,7 @@ async def test_successful_reconfigure_flow(
     select: list[int],
     fuel: str | None,
     expected: dict[int, list[str]],
+    expected_reason: str,
 ) -> None:
     """Test successful reconfigure flow."""
 
@@ -230,7 +235,7 @@ async def test_successful_reconfigure_flow(
         )
 
         assert result["type"] is FlowResultType.ABORT
-        assert result["reason"] == "reconfigured"
+        assert result["reason"] == expected_reason
 
     updated = hass.config_entries.async_get_entry(entry.entry_id)
 
