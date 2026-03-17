@@ -20,7 +20,7 @@ This [user guide](./nsw_fuel_station.md) highlights the functionality and explai
 
 ## Sensors Created
 - Sensors for favorite fuel station(s) grouped by nickname/location e.g. home, work.
-- Sensors for cheapest fuel near nickname/location
+- Sensors for cheapest fuel near nickname/location.
 
 ## Installation
 This integration is currently available as a [HACS](https://www.hacs.xyz/docs/use) custom integration. (It does, however, pass the automated quality checks for a core integration.) If you are new to HACS don't panic, it is in widespread use.
@@ -31,10 +31,9 @@ If you don't already have it, install [HACS](https://www.hacs.xyz/docs/use/) the
 
 ### Manual Installation
 
-A manual installation involves simply copying a few python files into your Home Assistant config/custom_components directory. You will need familiarity with the command line and one of the Apps that provide that such as [terminal](https://github.com/home-assistant/addons/tree/master/ssh).
+A manual installation involves simply copying a few python files into your Home Assistant config/custom_components directory. You will need familiarity with the command line and one of the Apps that provide access to the commandline such as [terminal](https://github.com/home-assistant/addons/tree/master/ssh).
 
-In MacOS or linux the steps are:
-
+```
 cd /tmp
 
 [git clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) https://github.com/bicycleboy/nsw_tas_fuel_station.git
@@ -42,6 +41,9 @@ cd /tmp
 cd /config/custom_components
 
 mv /tmp/nsw_fuel_station/custom_components/nsw_fuel_station.
+```
+
+You can of course inspect the files if you are concerned about anything.
 
 Re-start Home Assistant.
 
@@ -64,7 +66,7 @@ File | Purpose | Documentation
 `README.md` | The file you are reading now. | [Documentation](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax)
 
 ## Debugging
-To assist with any issues or determine if the API is returning unexpected results or there is a bug you can turn on debugging in your configuration.yaml.
+To assist with any issues, or determine if the API is returning unexpected results or there is a bug, you can turn on debugging in your configuration.yaml.
 
 ```
 logger:
@@ -74,7 +76,7 @@ logger:
 ```
 
 ## Contributing
-Contributions and feedback welcome, please visit https://github.com/bicycleboy/nsw_tas_fuel_ui, select **Issues** and choose either bug report or feature request.
+Contributions and feedback welcome, please visit https://github.com/bicycleboy/nsw_tas_fuel_station, select **Issues** and choose either bug report or feature request.
 
 ## Licence
 This software is licensed under the MIT License. See the [LICENCE](https://github.com/bicycleboy/nsw_tas_fuel_ui/LICENCE) file for details.
