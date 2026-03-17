@@ -247,7 +247,7 @@ async def test_successful_reconfigure_flow(
 
 async def test_config_flow_duplicate_entry(
     hass: HomeAssistant, mock_api_client: AsyncMock
-):
+) -> None:
     """Enforce one config entry per integration."""
 
     # Add existing config entry with same client_id
