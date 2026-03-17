@@ -42,7 +42,7 @@ sensor:
 Sensor names will be similar but with a new prefix so dashboard cards will need updating.
 
 # Installation
-Currently this is a custom integrtation, see [the readme](./README.md) for installation details.
+Currently this is a custom integration, see [the readme](./README.md) for installation details.
 
 # Configuration
 
@@ -52,13 +52,13 @@ On the setup screen, enter your credentials.
 
 ![Credentials](./images/enter_credentials.png)
 
-Once you have validated your key and secret you will be prompted to select fuel stations from the list of stations near your home zone.
+Once you have validated your key and secret you will be prompted to select fuel stations from the list of stations near your home zone. These "favorite" stations assume we are creatures of habit and typically fill up at stations that are often the cheapest near us.
 
 ![select stations](./images/select_stations.png)
 
-Select one or more stations.
+Select around 1 - 4 stations, more is hard to display neatly on a dashboard.
 
-Sensors will be created for each station you select.  In NSW and the ACT the default search is for Ethanol E10 and Unleaded U91. In Tasmania by default search is for Unleaded U91. Selected stations assumes we are creatures of habit and typically fill up at our favorite stations that are often the cheapest near us.
+Sensors will be created for each station you select.  In NSW and the ACT the default search is for Ethanol E10 and Unleaded U91. In Tasmania by default search is for Unleaded U91.
 
 Click Submit.
 
@@ -102,11 +102,13 @@ A name to group your sensors under.  For example "Home" or "Work".  Accept the d
 
 Location:
 
-Use the location selector to choose another location.  Foe example if you have changed the nickname to "Work" change the location accordingly.  You can also change the location for an existing nickname such as "Home" if you want a sensor for a station that is not currently listed.
+Use the location selector to choose another location.  For example if you have changed the nickname to "Work" change the location accordingly.  You can also change the location for an existing nickname such as "Home" if you want a sensor for a station that is not currently listed.
 
 Fuel Type:
 
 Pick a fuel type to see a list of stations stocking that fuel type.  If, for example you only care about Diesel, you can create Diesel sensors and disable other sensors.
+
+![advanced](./images/advanced.png)
 
 On Submit you will return to the Select Stations screen where there will be a list of stations for the location you entered and/or which carry the fuel you selected.
 
@@ -147,9 +149,19 @@ No price is shown, only unavailable for the 2nd cheapest sensor.
 
 #### Resolution
 
-In rural areas the NSW Fuel Check API may only return 1 station.  Try changing the location for the nickname repeatedly until you get a useful list of stations, these will likely be the stations that are "surveyed" for the cheapest fuel. 
+In rural areas the NSW Fuel Check API may only return 1 station.  Try changing the location for the nickname repeatedly until you get a useful list of stations, these will likely be the stations that are "surveyed" for the cheapest fuel.
 
 If a sensor consistently shows as unavailable you can disable the sensor using [Settings > Devices & services > Entities ](https://www.home-assistant.io/docs/configuration/customizing-devices/).
+
+## I am not seeing the stations I expected in the select stations list
+
+#### Description
+
+Your stations list is missing stations you expected to see.
+
+#### Resolution
+
+This can be for a number of reasons. For example you searched to U91 but the station does not stock U91.  Try different fuel types and locations. You can also turn on debugging as described in [the readme](./README.md) and check the logs for errors and details of the parameters sent to NSW Fuel Check.
 
 # Feedback
 Feedback, ideas, requests, bugs all welcome and can be made [here](https://github.com/bicycleboy/nsw_tas_fuel_station/issues).
