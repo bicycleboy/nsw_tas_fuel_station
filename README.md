@@ -36,7 +36,7 @@ A manual installation involves simply copying a few python files into your Home 
 ```
 cd /tmp
 
-[git clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) https://github.com/bicycleboy/nsw_tas_fuel_station.git
+git clone https://github.com/bicycleboy/nsw_tas_fuel_station.git
 
 cd /config/custom_components
 
@@ -64,6 +64,7 @@ File | Purpose | Documentation
 `pyproject.toml` | Python setup and configuration for this integration. | [Documentation](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/)
 `tests/*.py` | Unit test files for each .py file without calling any real APIs. |
 `README.md` | The file you are reading now. | [Documentation](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax)
+`nsw_fuel_station.md` | User Guide. | [Documentation](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax)
 
 ## Debugging
 To assist with any issues, or determine if the API is returning unexpected results or there is a bug, you can turn on debugging in your configuration.yaml.
