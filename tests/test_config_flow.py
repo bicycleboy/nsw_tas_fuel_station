@@ -18,6 +18,7 @@ from custom_components.nsw_tas_fuel_station.const import (
     CONF_FUEL_TYPE,
     CONF_LOCATION,
     CONF_NICKNAME,
+    CONF_RADIUS,
     CONF_SELECTED_STATIONS,
     DEFAULT_NICKNAME,
     DOMAIN,
@@ -106,12 +107,22 @@ async def test_successful_config_flow(
 
 
 @pytest.mark.parametrize(
-    ("existing", "select", "fuel", "expected", "expected_reason"),
+    (
+        "existing",
+        "select",
+        "fuel",
+        "radius_meters",
+        "expected_radius_km",
+        "expected",
+        "expected_reason",
+    ),
     [
         pytest.param(
             {},
             [STATION_NSW_A],
             None,
+            25_000,
+            25,
             {STATION_NSW_A: ["E10", "U91"]},
             "nickname_created",
             id="new-nickname",
@@ -120,9 +131,11 @@ async def test_successful_config_flow(
             {},
             [STATION_NSW_B],
             None,
+            25_001,
+            26,
             {STATION_NSW_B: ["U91"]},
             "nickname_created",
-            id="new-nickname-combo-observed-fuels",
+            id="new-nickname-combo-observed-fuels-radius-round-up",
         ),
         pytest.param(
             {
@@ -142,6 +155,8 @@ async def test_successful_config_flow(
             },
             [STATION_NSW_B],
             None,
+            10_001,
+            11,
             {
                 STATION_NSW_A: ["E10", "U91"],
                 STATION_NSW_B: ["U91"],
@@ -173,6 +188,8 @@ async def test_successful_config_flow(
             },
             [STATION_NSW_A],
             "DL",
+            5_100,
+            6,
             {
                 STATION_NSW_A: ["DL", "E10"],
                 STATION_NSW_B: ["U91"],
@@ -188,6 +205,8 @@ async def test_successful_reconfigure_flow(
     existing: dict[str, Any],
     select: list[int],
     fuel: str | None,
+    radius_meters: float,
+    expected_radius_km: int,
     expected: dict[int, list[str]],
     expected_reason: str,
 ) -> None:
@@ -223,7 +242,11 @@ async def test_successful_reconfigure_flow(
             result["flow_id"],
             {
                 CONF_NICKNAME: DEFAULT_NICKNAME,
-                CONF_LOCATION: {"latitude": HOME_LAT, "longitude": HOME_LNG},
+                CONF_LOCATION: {
+                    "latitude": HOME_LAT,
+                    "longitude": HOME_LNG,
+                    CONF_RADIUS: radius_meters,
+                },
                 CONF_FUEL_TYPE: fuel or "E10-U91",
             },
         )
@@ -243,6 +266,15 @@ async def test_successful_reconfigure_flow(
     assert get_station_map(updated.data) == {
         code: sorted(fuels) for code, fuels in expected.items()
     }
+
+    nickname_data = updated.data["nicknames"][DEFAULT_NICKNAME]
+    assert nickname_data["radius_km"] == expected_radius_km
+
+    assert mock_api_client.get_fuel_prices_within_radius.await_args
+    assert (
+        mock_api_client.get_fuel_prices_within_radius.await_args.kwargs["radius"]
+        == expected_radius_km
+    )
 
 
 async def test_config_flow_duplicate_entry(
@@ -558,7 +590,9 @@ async def test_advanced_options_preserves_user_location_and_fuel_on_error(
         for key in schema.schema
         if isinstance(key, vol.Marker) and key.default is not vol.UNDEFINED
     }
-    assert defaults.get(CONF_LOCATION) == user_location
+    assert defaults.get(CONF_LOCATION) is not None
+    assert defaults[CONF_LOCATION]["latitude"] == user_location["latitude"]
+    assert defaults[CONF_LOCATION]["longitude"] == user_location["longitude"]
     assert defaults.get(CONF_FUEL_TYPE) == user_fuel
 
 
