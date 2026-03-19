@@ -31,16 +31,6 @@ Like weather integrations, the idea is not to replace the NSW Fuel Check App but
 
 ![API Signup](./images/api_signup.png)
 
-4. If you already have the NSW Fuel Station core integration delete the sensor configuration from configuration.yaml (ie using File Viewer) and then reboot home assistant.  Delete lines that look like this:
-```
-sensor:
-  - platform: nsw_fuel_station
-    station_id: 18798
-  - platform: nsw_fuel_station
-    station_id: 18813
-```
-Sensor names will be similar but with a new prefix so dashboard cards will need updating.
-
 # Installation
 Currently this is a custom integration, see [the readme](./README.md) for installation details.
 
@@ -116,7 +106,7 @@ You can add fuel types to an existing station.
 
 You can also add stations to an existing nickname.
 
-You can change the location associated with an existing nickname, for example to group stations under "trip to work", however, currently only the last location set will be used for the "Cheapest \[*nickname*\] #1/2" sensors.
+You can change the location associated with an existing nickname, for example to group stations under "trip to work", however, currently only the last location set will be used for the "Cheapest \[*nickname*\] #1/2" sensors (see also troubleshooting).
 
 
 # Data updates
@@ -149,11 +139,11 @@ No price is shown, only unavailable for the 2nd cheapest sensor.
 
 #### Resolution
 
-In rural areas the NSW Fuel Check API may only return 1 station.  Try changing the location for the nickname repeatedly until you get a useful list of stations, these will likely be the stations that are "surveyed" for the cheapest fuel.
+In some locations the NSW Fuel Check API may only return 1 station.  Try changing the location for the nickname repeatedly until you get a useful list of stations, these will likely be the stations that are "surveyed" for the cheapest fuel.
 
 If a sensor consistently shows as unavailable you can disable the sensor using [Settings > Devices & services > Entities ](https://www.home-assistant.io/docs/configuration/customizing-devices/).
 
-## I am not seeing the stations I expected in the select stations list
+## I only see one station / I am not seeing the stations I expected in the select stations list
 
 #### Description
 
@@ -161,7 +151,35 @@ Your stations list is missing stations you expected to see.
 
 #### Resolution
 
-This can be for a number of reasons. For example you searched to U91 but the station does not stock U91.  Try different fuel types and locations. You can also turn on debugging as described in [the readme](./README.md) and check the logs for errors and details of the parameters sent to NSW Fuel Check.
+This can be for a number of reasons. For example you searched to U91 but the station does not stock U91. Use **Reconfigure** and try different fuel types and locations. If you see only one station try using different locations and radius settings to get all the stations you want. If you are still not seeing what you want see "I want to know the cheapest price close to my usual routes" below. You can also turn on debugging as described in [the readme](./README.md) and check the logs for errors and details of the parameters sent to NSW Fuel Check.
+
+## I just want 1 cheapest sensor / I want a sensor to cover my entire trip to work but only close to my route
+
+#### Description
+
+I want to know the cheapest price close to my usual routes.
+
+#### Resolution (Advanced)
+
+1. Use the **Reconfigue** option with a small, say 5Km, radius to create multiple nicknames along your route(s).  Select just 1 station.
+2. Edit your configuration.yaml and create a template sensor similar to [this example](./example_template_sensor.yaml).  You will of course need to change the sensor names to match yours.
+3. Add the template sensor to your dashboard.  You can find example cards like the below using the template sensor [here](./example_card_template_sensor.yaml).
+4. You may wish to disable any station entities created if you are not using them on your dashboard.
+
+![templatesensor](./images/example_card_template_sensor.png)
+
+## I am a Diesel/LPG/Premiun Petrol user
+
+#### Description
+
+The cheapest sensors currently only offer E10/U91.
+
+#### Resolution (Advanced)
+
+1. Select your favorite stations at one or more locations using the **Reconfigure** option.
+1. Edit your configuration.yaml and create a template sensor similar to [this example](./example_template_sensor.yaml).  Currently you have to choose which stations to compare, it is not done for you as with E10/U91.
+3. Add the template sensor to your dashboard.  You can find example cards using the template sensor [here](./example_card_template_sensor.yaml).  Note that unlike the cheapest sensors, for the station sensors the sensor name is the station name so the template and card are more simple.
+
 
 # Feedback
 Feedback, ideas, requests, bugs all welcome and can be made [here](https://github.com/bicycleboy/nsw_tas_fuel_station/issues).

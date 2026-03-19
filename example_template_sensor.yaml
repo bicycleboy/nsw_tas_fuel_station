@@ -1,0 +1,39 @@
+template:
+  - sensor:
+      - name: "Cheapest Great Western Highway"
+        unit_of_measurement: "c/L"
+        device_class: monetary
+        unique_id: s85823875423
+        state: >
+          {% set candidates = [
+            {
+              'entity': 'sensor.colyton_cheapest_colyton_1',
+              'price': states('sensor.colyton_cheapest_colyton_1') | float(9999),
+              'station': state_attr('sensor.colyton_cheapest_colyton_1', 'station_name')
+            },
+            {
+              'entity': 'sensor.penrith_cheapest_penrith_1',
+              'price': states('sensor.penrith_cheapest_penrith_1') | float(9999),
+              'station': state_attr('sensor.penrith_cheapest_penrith_1', 'station_name')
+            }
+          ] %}
+          {{ (candidates | sort(attribute='price') | first).price | round(1) }}
+        availability: >
+          {{ states('sensor.colyton_cheapest_colyton_1') not in ['unknown','unavailable']
+             or states('sensor.penrith_cheapest_penrith_1') not in ['unknown','unavailable'] }}
+        attributes:
+          station_name: >
+            {% set candidates = [
+              {
+                'entity': 'sensor.colyton_cheapest_colyton_1',
+                'price': states('sensor.colyton_cheapest_colyton_1') | float(9999),
+                'station': state_attr('sensor.colyton_cheapest_colyton_1', 'station_name')
+              },
+              {
+                'entity': 'sensor.penrith_cheapest_penrith_1',
+                'price': states('sensor.penrith_cheapest_penrith_1') | float(9999),
+                'station': state_attr('sensor.penrith_cheapest_penrith_1', 'station_name')
+              }
+            ] %}
+            {% set winner = candidates | sort(attribute='price') | first %}
+            {{ winner.station or 'Unknown' }}

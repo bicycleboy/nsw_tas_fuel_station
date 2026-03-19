@@ -53,6 +53,18 @@ You can of course inspect the files if you are concerned about anything.
 
 Re-start Home Assistant.
 
+## Removing the existing NSW Fuel Station Integration
+
+If you already have the NSW Fuel Station core integration delete the sensor configuration from configuration.yaml (ie using File Viewer) and then reboot home assistant.  Delete lines that look like this:
+```
+sensor:
+  - platform: nsw_fuel_station
+    station_id: 18798
+  - platform: nsw_fuel_station
+    station_id: 18813
+```
+Sensor names will be similar but with a new prefix so dashboard cards will need updating.
+
 ## Removing the integration
 Remove the integration in the standard way from:
 Settings -> Devices and Services -> Select NSW Fuel Check Integration -> three dots -> Delete.

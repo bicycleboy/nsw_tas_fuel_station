@@ -1,0 +1,46 @@
+type: grid
+cards:
+  - type: heading
+    heading: Example using template sensor
+    heading_style: title
+  - type: tile
+    grid_options:
+      columns: 12
+      rows: 1
+    entity: sensor.cheapest_great_western_highway
+    icon: mdi:gas-station
+    state_content:
+      - state
+      - station_name
+    vertical: false
+    features_position: bottom
+  - graph: none
+    type: sensor
+    entity: sensor.cheapest_great_western_highway
+    detail: 1
+    grid_options:
+      columns: 12
+      rows: 2
+    icon: mdi:gas-station-in-use
+  - type: tile
+    grid_options:
+      columns: 9
+      rows: 1
+    entity: sensor.colyton_cheapest_colyton_1
+    name: Cheapest E10/U91 Colyton
+    state_content:
+      - station_name
+      - state
+    vertical: false
+    features_position: bottom
+  - type: tile
+    entity: sensor.penrith_cheapest_penrith_1
+    name: Cheapest E10/U91 Penrith
+    state_content:
+      - station_name
+      - state
+    vertical: false
+    features_position: bottom
+    grid_options:
+      columns: 9
+      rows: 1
