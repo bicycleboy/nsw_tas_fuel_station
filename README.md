@@ -1,3 +1,9 @@
+
+<p align="center">
+  <a href="https://github.com/custom-components/hacs"><img src="https://img.shields.io/badge/HACS-Custom-orange.svg"></a>
+  <img src="https://img.shields.io/github/v/release/bicycleboy/nsw_tas_fuel_station" alt="Current version">
+</p>
+
 # NSW Fuel Check Integration
 
 Integration allowing fuel prices to be included in Home Assistant dashboards.
