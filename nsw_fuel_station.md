@@ -184,7 +184,7 @@ Currently the cheapest sensors only offer E10/U91.
 
 1. This is a workaround which requires comfort with editing configuration.yaml.  Unlike the E10/U91 cheapest sensors which use the API to find the cheapest stations by location as reported to NSW Fuel Check/FuelCheck - TAS, this solution only ever compares the stations you configure.
 2. Select your favorite stations at one or more locations using the **Reconfigure** option, creating multiple nicknames/locations if required.  You may wish to create multiple small (say 5Km) nicknames along major routes. To avoid API rate limits choose less than around 20 stations you are actually likely to use.
-3. Edit your configuration.yaml and create a template sensor similar to [this example (thanks to @jfp949
+3. Edit your configuration.yaml and create a template sensor similar to [this example (thanks to @TQ1331
 )](./example_cheapest_diesel.yaml).  You can cut and paste your sensor names into your favorite AI together with this example and it will doubtless generate the code for you. You can get names from the entities view, sorted by Integration. Your AI may also show you ways to generate all sensor names dynamically for each nickname.
 4. Restart HA to enable the template sensor.
 3. Add the template sensor to your dashboard, such as the example below. (Create a tile card, then use "Show card editor" to drop in the below.)
