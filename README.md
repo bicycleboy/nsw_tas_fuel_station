@@ -13,7 +13,7 @@ Feedback, issues and feature requests are welcome and can be made [here](https:/
 
 ## Features
 - Allows users to include NSW, ACT and Tasmanian fuel prices into their home assistant dashboards and automations.  Currently only these Australian states are supported as other states offer different APIs.
-- This 2026 update to the existing core integration allows the user to configure the integration via the user interface (vs configuration.yaml) and adds a "cheapest today" sensor.
+- This 2026 update to the existing core integration allows the user to configure the integration via the user interface (vs configuration.yaml) and adds a "cheapest E10/U91 today" sensor.
 
 ## Example Cards for Your Home Assistant Dashboard
 
@@ -29,15 +29,19 @@ This [user guide](./nsw_fuel_station.md) highlights the functionality and explai
 - Sensors for cheapest fuel near nickname/location.
 
 ## Installation
-This integration is currently available as a [HACS](https://www.hacs.xyz/docs/use) custom integration. (It does, however, pass the automated quality checks for a core integration.) If you are new to HACS don't panic, it is in widespread use.
+This integration is currently available as a [HACS](https://www.hacs.xyz/docs/use) custom integration. (It does, however, pass the automated quality checks for a core integration.) If you are new to HACS don't panic, it is in widespread use. HACS will prompt you when integrations are updated with new features and fixes.
 
-### HACS Installation
+### HACS Installation (recommended)
 
-If you don't already have it, install [HACS](https://www.hacs.xyz/docs/use/) then follow the [guide for installing custom repositories](https://hacs.xyz/docs/faq/custom_repositories/). In the repository field enter the address of this git repository "github.com/bicycleboy/nsw_tas_fuel_station".
+1. If you don't already have it, install [HACS](https://www.hacs.xyz/docs/use/), remembering to restart HA after installation.
+2. Follow the [guide for installing custom repositories](https://hacs.xyz/docs/faq/custom_repositories/). In the repository field enter the address of this git repository "github.com/bicycleboy/nsw_tas_fuel_station".
+3. Restart HA.
+4. Go to Settings -> Integrations, Select NSW Fuel Check and follow the prompts to configure the integration (see also the [user guide](./nsw_fuel_station.md)).
+5. Create dashboard cards (see user guide).
 
 ### Manual Installation
 
-A manual installation involves simply copying a few python files into your Home Assistant config/custom_components directory. You will need familiarity with the command line and one of the Apps that provide access to the commandline such as [terminal](https://github.com/home-assistant/addons/tree/master/ssh).
+A manual installation involves simply copying a few python files into your Home Assistant config/custom_components directory. You will need familiarity with the command line and one of the Apps that provide access to the command line such as [terminal](https://github.com/home-assistant/addons/tree/master/ssh).
 
 ```
 cd /tmp
@@ -65,7 +69,7 @@ sensor:
 ```
 Sensor names will be similar but with a new prefix so dashboard cards will need updating.
 
-## Removing the integration
+## Removing this integration
 Remove the integration in the standard way from:
 Settings -> Devices and Services -> Select NSW Fuel Check Integration -> three dots -> Delete.
 Delete cards from dashboards for all users.

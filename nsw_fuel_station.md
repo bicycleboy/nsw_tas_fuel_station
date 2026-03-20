@@ -16,7 +16,7 @@ related:
 ---
 -->
 
-The **NSW Fuel Check** integration is used to integrate with the NSW Government API for Fuel Prices.
+The **NSW Fuel Check** integration is used to integrate with the NSW Government API for Fuel Prices using official mandatory reporting data from NSW Fuel Check and FuelCheck - TAS.
 
 This integration only supports Australian states NSW, the ACT and Tasmania.
 
@@ -46,7 +46,7 @@ Once you have validated your key and secret you will be prompted to select fuel 
 
 ![select stations](./images/select_stations.png)
 
-Select around 1 - 4 stations, more is hard to display neatly on a dashboard.
+Select around 1 - 4 stations, more is hard to display neatly on a dashboard.  Also be aware the API does have rate limits if you choose 10's of stations.
 
 Sensors will be created for each station you select.  In NSW and the ACT the default search is for Ethanol E10 and Unleaded U91. In Tasmania by default search is for Unleaded U91.
 
@@ -65,7 +65,7 @@ Two additional sensors will be created:
 - Cheapest Home #1
 - Cheapest Home #2
 
-The NSW Fuel Check API returns a balance between cheapest fuel and distance from your home zone. For NSW the integration looks for the lowest U91 and E10 prices.
+The NSW Fuel Check API returns a balance between cheapest fuel and distance from your home zone. For NSW the integration looks for the lowest of U91 and E10 prices.
 
 ![cheapest stations](./images/tile_card_find_cheapest_sensor.png)
 
@@ -111,12 +111,16 @@ You can change the location associated with an existing nickname, for example to
 
 # Data updates
 
-The **NSW Fuel Check** integration term polling polls data from the API twiced a day by default.
+The **NSW Fuel Check** integration polls data from the API twiced a day by default.
 
 # Known limitations
 
 The integration currently only supports New South Wales, the ACT and Tasmania (Australia).
+
+The cheapest sensor currently only supports E10/U91, for other fuels see troubleshooting.
+
 Some fuel types such as EV can be selected but currently do not return any data.
+
 Selecting less common fuel types may produce unexpected results, e.g. NSW stations included in Tasmania.
 
 # Troubleshooting
@@ -151,35 +155,51 @@ Your stations list is missing stations you expected to see.
 
 #### Resolution
 
-This can be for a number of reasons. For example you searched to U91 but the station does not stock U91. Use **Reconfigure** and try different fuel types and locations. If you see only one station try using different locations and radius settings to get all the stations you want. If you are still not seeing what you want see "I want to know the cheapest price close to my usual routes" below. You can also turn on debugging as described in [the readme](./README.md) and check the logs for errors and details of the parameters sent to NSW Fuel Check.
+This can be for a number of reasons. For example you searched to U91 but the station does not stock U91. Use **Reconfigure** and try different fuel types and locations. Try using different locations and radius settings to get all the stations you want. If you are still not seeing what you want, see "I want to know the cheapest price close to my usual routes" below. You can also turn on debugging as described in [the readme](./README.md) and check the logs for errors and details of the parameters sent to NSW Fuel Check.
 
 ## I just want 1 cheapest sensor / I want a sensor to cover my entire trip to work but only close to my route
 
 #### Description
 
-I want to know the cheapest price close to my usual routes.
+I want to know the cheapest price close to my usual routes, without cluttering my dashboard with many cards.
 
 #### Resolution (Advanced)
 
-1. Use the **Reconfigue** option with a small, say 5Km, radius to create multiple nicknames along your route(s).  Select just 1 station.
-2. Edit your configuration.yaml and create a template sensor similar to [this example](./example_template_sensor.yaml).  You will of course need to change the sensor names to match yours.
-3. Add the template sensor to your dashboard.  You can find example cards like the below using the template sensor [here](./example_card_template_sensor.yaml).
-4. You may wish to disable any station entities created if you are not using them on your dashboard.
+1. This solution requires comfort with editing configuration.yaml.
+2. Use the **Reconfigue** option with a small, say 5Km, radius to create multiple nicknames along your route(s).  Select just 1 station.
+3. Edit your configuration.yaml and create a template sensor similar to [this example](./example_template_sensor.yaml).  You will of course need to change the sensor names to match yours or get your favorite AI to do it for you.
+4. Restart HA.
+5. Add the template sensor to your dashboard.  You can find example cards like the below using the template sensor [here](./example_card_template_sensor.yaml).
+6. You may wish to disable any station entities created if you are not using them on your dashboard to avoid API rate limits.
 
 ![templatesensor](./images/example_card_template_sensor.png)
 
-## I am a Diesel/LPG/Premiun Petrol user
+## I am a Diesel/Premiun Petrol user, how do I find the cheapest?
 
 #### Description
 
-The cheapest sensors currently only offer E10/U91.
+Currently the cheapest sensors only offer E10/U91.
 
 #### Resolution (Advanced)
 
-1. Select your favorite stations at one or more locations using the **Reconfigure** option.
-1. Edit your configuration.yaml and create a template sensor similar to [this example](./example_template_sensor.yaml).  Currently you have to choose which stations to compare, it is not done for you as with E10/U91.
-3. Add the template sensor to your dashboard.  You can find example cards using the template sensor [here](./example_card_template_sensor.yaml).  Note that unlike the cheapest sensors, for the station sensors the sensor name is the station name so the template and card are more simple.
-
+1. This is a workaround which requires comfort with editing configuration.yaml.  Unlike the E10/U91 cheapest sensors which use the API to find the cheapest stations by location as reported to NSW Fuel Check/FuelCheck - TAS, this solution only ever compares the stations you configure.
+2. Select your favorite stations at one or more locations using the **Reconfigure** option, creating multiple nicknames/locations if required.  You may wish to create multiple small (say 5Km) nicknames along major routes. To avoid API rate limits choose less than around 20 stations you are actually likely to use.
+3. Edit your configuration.yaml and create a template sensor similar to [this example (thanks to @jfp949
+)](./example_cheapest_diesel.yaml).  You can cut and paste your sensor names into your favorite AI together with this example and it will doubtless generate the code for you. You can get names from the entities view, sorted by Integration. Your AI may also show you ways to generate all sensor names dynamically for each nickname.
+4. Restart HA to enable the template sensor.
+3. Add the template sensor to your dashboard, such as the example below. (Create a tile card, then use "Show card editor" to drop in the below.)
+```
+type: tile
+grid_options:
+  columns: 21
+  rows: 2
+entity: sensor.cheapest_diesel
+state_content:
+  - station_name
+  - state
+vertical: false
+features_position: bottom
+```
 
 # Feedback
 Feedback, ideas, requests, bugs all welcome and can be made [here](https://github.com/bicycleboy/nsw_tas_fuel_station/issues).

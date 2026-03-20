@@ -1,0 +1,125 @@
+      - name: "Cheapest Diesel"
+        unit_of_measurement: "c/L"
+        device_class: monetary
+        unique_id: s_cheapest_diesel_dl
+        state: >
+          {% set candidates = [
+            {
+              'entity': 'sensor.riverstone_ampol_foodary_marsden_park_dl',
+              'price': states('sensor.riverstone_ampol_foodary_marsden_park_dl') | float(9999),
+              'station': state_attr('sensor.riverstone_ampol_foodary_marsden_park_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.riverstone_independent_riverstone_dl',
+              'price': states('sensor.riverstone_independent_riverstone_dl') | float(9999),
+              'station': state_attr('sensor.riverstone_independent_riverstone_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.riverstone_metro_marsden_park_truck_stop_dl',
+              'price': states('sensor.riverstone_metro_marsden_park_truck_stop_dl') | float(9999),
+              'station': state_attr('sensor.riverstone_metro_marsden_park_truck_stop_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.riverstone_otr_marsden_park_north_dl',
+              'price': states('sensor.riverstone_otr_marsden_park_north_dl') | float(9999),
+              'station': state_attr('sensor.riverstone_otr_marsden_park_north_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.riverstone_otr_rouse_hill_dl',
+              'price': states('sensor.riverstone_otr_rouse_hill_dl') | float(9999),
+              'station': state_attr('sensor.riverstone_otr_rouse_hill_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.windsor_ampol_foodary_windsor_south_dl',
+              'price': states('sensor.windsor_ampol_foodary_windsor_south_dl') | float(9999),
+              'station': state_attr('sensor.windsor_ampol_foodary_windsor_south_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.windsor_bp_oakville_dl',
+              'price': states('sensor.windsor_bp_oakville_dl') | float(9999),
+              'station': state_attr('sensor.windsor_bp_oakville_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.windsor_bp_riverstone_dl',
+              'price': states('sensor.windsor_bp_riverstone_dl') | float(9999),
+              'station': state_attr('sensor.windsor_bp_riverstone_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.windsor_freedom_fuels_vineyard_dl',
+              'price': states('sensor.windsor_freedom_fuels_vineyard_dl') | float(9999),
+              'station': state_attr('sensor.windsor_freedom_fuels_vineyard_dl', 'friendly_name')
+            },
+            {
+              'entity': 'sensor.windsor_metco_petroleum_dl',
+              'price': states('sensor.windsor_metco_petroleum_dl') | float(9999),
+              'station': state_attr('sensor.windsor_metco_petroleum_dl', 'friendly_name')
+            }
+          ] %}
+          {{ (candidates | sort(attribute='price') | first).price | round(1) }}
+        availability: >
+          {{ states('sensor.riverstone_ampol_foodary_marsden_park_dl') not in ['unknown','unavailable']
+             or states('sensor.riverstone_independent_riverstone_dl') not in ['unknown','unavailable']
+             or states('sensor.riverstone_metro_marsden_park_truck_stop_dl') not in ['unknown','unavailable']
+             or states('sensor.riverstone_otr_marsden_park_north_dl') not in ['unknown','unavailable']
+             or states('sensor.riverstone_otr_rouse_hill_dl') not in ['unknown','unavailable']
+             or states('sensor.windsor_ampol_foodary_windsor_south_dl') not in ['unknown','unavailable']
+             or states('sensor.windsor_bp_oakville_dl') not in ['unknown','unavailable']
+             or states('sensor.windsor_bp_riverstone_dl') not in ['unknown','unavailable']
+             or states('sensor.windsor_freedom_fuels_vineyard_dl') not in ['unknown','unavailable']
+             or states('sensor.windsor_metco_petroleum_dl') not in ['unknown','unavailable'] }}
+        attributes:
+          station_name: >
+            {% set candidates = [
+             {
+                'entity': 'sensor.riverstone_ampol_foodary_marsden_park_dl',
+                'price': states('sensor.riverstone_ampol_foodary_marsden_park_dl') | float(9999),
+                'station': state_attr('sensor.riverstone_ampol_foodary_marsden_park_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.riverstone_independent_riverstone_dl',
+                'price': states('sensor.riverstone_independent_riverstone_dl') | float(9999),
+                'station': state_attr('sensor.riverstone_independent_riverstone_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.riverstone_metro_marsden_park_truck_stop_dl',
+                'price': states('sensor.riverstone_metro_marsden_park_truck_stop_dl') | float(9999),
+                'station': state_attr('sensor.riverstone_metro_marsden_park_truck_stop_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.riverstone_otr_marsden_park_north_dl',
+                'price': states('sensor.riverstone_otr_marsden_park_north_dl') | float(9999),
+                'station': state_attr('sensor.riverstone_otr_marsden_park_north_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.riverstone_otr_rouse_hill_dl',
+                'price': states('sensor.riverstone_otr_rouse_hill_dl') | float(9999),
+                'station': state_attr('sensor.riverstone_otr_rouse_hill_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.windsor_ampol_foodary_windsor_south_dl',
+                'price': states('sensor.windsor_ampol_foodary_windsor_south_dl') | float(9999),
+                'station': state_attr('sensor.windsor_ampol_foodary_windsor_south_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.windsor_bp_oakville_dl',
+                'price': states('sensor.windsor_bp_oakville_dl') | float(9999),
+                'station': state_attr('sensor.windsor_bp_oakville_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.windsor_bp_riverstone_dl',
+                'price': states('sensor.windsor_bp_riverstone_dl') | float(9999),
+                'station': state_attr('sensor.windsor_bp_riverstone_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.windsor_freedom_fuels_vineyard_dl',
+                'price': states('sensor.windsor_freedom_fuels_vineyard_dl') | float(9999),
+                'station': state_attr('sensor.windsor_freedom_fuels_vineyard_dl', 'friendly_name')
+              },
+              {
+                'entity': 'sensor.windsor_metco_petroleum_dl',
+                'price': states('sensor.windsor_metco_petroleum_dl') | float(9999),
+                'station': state_attr('sensor.windsor_metco_petroleum_dl', 'friendly_name')
+              }
+            ] %}
+            {% set winner = candidates | sort(attribute='price') | first %}
+            {{ winner.station or 'Unknown' }}
