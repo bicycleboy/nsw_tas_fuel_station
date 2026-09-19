@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from pytest_homeassistant_custom_component.common import MockConfigEntry
-
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.nsw_tas_fuel_station import async_remove_config_entry_device
 from custom_components.nsw_tas_fuel_station.const import DOMAIN
