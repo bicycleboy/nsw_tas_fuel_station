@@ -78,7 +78,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
     to support "cheapest near ..." sensors but also to give user more options in UI
     """
 
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self) -> None:
         """Init Config Flow."""

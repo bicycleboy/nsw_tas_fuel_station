@@ -80,7 +80,7 @@ class FuelPriceSensor(CoordinatorEntity[NSWFuelCoordinator], SensorEntity):
         self._au_state = au_state
         self._station_name = station_name
         self._fuel_type = fuel_type
-        self._attr_unique_id = f"{DOMAIN}_{station_code}_{au_state}_{fuel_type}"
+        self._attr_unique_id = f"{DOMAIN}_{nickname}_{station_code}_{au_state}_{fuel_type}"
         self._attr_attribution = _attribution_for_state(au_state)
 
     @property
