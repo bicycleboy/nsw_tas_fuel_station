@@ -97,9 +97,13 @@ async def test_async_setup_entry_creates_entities(
     def _add_entities(new_entities) -> None:
         entities.extend(new_entities)
 
-    with patch.object(coordinator, "async_config_entry_first_refresh", new=AsyncMock()):
+    refresh = AsyncMock()
+    with patch.object(
+        coordinator, "async_config_entry_first_refresh", new=refresh
+    ):
         await async_setup_entry(hass, mock_config_entry, _add_entities)
 
+    refresh.assert_not_awaited()
     assert entities
     assert any(isinstance(e, FuelPriceSensor) for e in entities)
     assert any(isinstance(e, CheapestFuelPriceSensor) for e in entities)

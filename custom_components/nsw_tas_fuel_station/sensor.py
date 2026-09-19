@@ -6,7 +6,6 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
-from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
@@ -38,11 +37,6 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensors for NSW Fuel Check from a config entry."""
     coordinator: NSWFuelCoordinator = hass.data[DOMAIN][config_entry.entry_id]
-
-    try:
-        await coordinator.async_config_entry_first_refresh()
-    except Exception as err:
-        raise ConfigEntryNotReady from err
 
     nicknames = config_entry.data.get("nicknames", {})
 
