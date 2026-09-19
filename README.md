@@ -15,12 +15,37 @@ Feedback, issues and feature requests are welcome and can be made [here](https:/
 - Allows users to include NSW, ACT and Tasmanian fuel prices into their home assistant dashboards and automations.  Currently only these Australian states are supported as other states offer different APIs.
 - This 2026 update to the existing core integration allows the user to configure the integration via the user interface (vs configuration.yaml) and adds sensors for the cheapest fuel found by the API.
 - September 2026 release adds the ability to choose the fuel type searched for by the cheapest sensors primarily to support Diesel and U95/U98.  This release also adds the ability to exclude stations from the cheapest sensors such as members only brands.
+- Reconfigure now provides dedicated paths to add a new location, add stations to an existing location, edit existing nickname/location settings, and manage configured stations and their fuel types. Stations can be removed individually, and removing the final station from a nickname/location can also remove the now-empty location and its entities after confirmation.
 
 ## Example Cards for Your Home Assistant Dashboard
 
 ![example cards](./images/example_cards.png)
 
 [Example card yaml](https://github.com/bicycleboy/nsw_tas_fuel_station/blob/main/example_cards.yaml)
+
+## Managing an existing configuration
+
+After the integration has been set up, existing locations, stations and fuel types are managed from the integration's **Reconfigure** flow.
+
+In Home Assistant go to:
+
+**Settings -> Devices & services -> NSW Fuel Check -> three dots -> Reconfigure**
+
+The Reconfigure menu provides:
+
+- **Add new location** - create a new nickname/location and select its initial stations.
+- **Add station to existing location** - choose an existing location from a dropdown, then search for and add another station without changing that location's saved cheapest-fuel settings.
+- **Edit existing location settings** - change an existing location/search radius, cheapest-fuel search type, or cheapest-station exclusion text without changing its favorite stations.
+- **Manage configured stations** - choose an existing nickname/location, then add or remove configured fuel types for a station, or remove the station. After a successful change the station list stays open so you can continue managing the same location.
+- **Delete location** - remove an entire nickname/location, including its configured station entities and cheapest-price entities, after confirmation.
+
+When editing a station, the fuel selector shows the fuel types currently reported by FuelCheck for that station, plus any fuel types already configured for it. This avoids offering fuels that the selected station does not currently report.
+
+If the final configured station is removed from a nickname/location, Home Assistant asks for confirmation before removing the now-empty location device and its cheapest-price entities. You can also use **Delete location** directly, including for an already-empty location.
+
+Changes to an existing location's cheapest-fuel settings are validated against FuelCheck before they are saved. If the selected fuel, radius, location or exclusion text produces no matching prices, the form remains open and explains what to change.
+
+Home Assistant places **Reconfigure** in the integration entry's three-dot menu, so it may not be immediately obvious to new users. Use the path above whenever you want to modify an existing NSW Fuel Check configuration.
 
 ## User Guide
 This [user guide](./nsw_fuel_station.md) highlights the functionality and explains how to configure the integration once installed.
