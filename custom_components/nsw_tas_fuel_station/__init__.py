@@ -16,6 +16,7 @@ from .coordinator import NSWFuelCoordinator
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.device_registry import AnyDeviceEntry
 
     from .data import NSWFuelConfigEntry
 
@@ -70,6 +71,35 @@ async def async_unload_entry(hass: HomeAssistant, entry: NSWFuelConfigEntry) -> 
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)
     return unload_ok
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant,
+    entry: NSWFuelConfigEntry,
+    device_entry: AnyDeviceEntry,
+) -> bool:
+    """Remove a nickname device and its stored configuration."""
+    nicknames: dict[str, dict[str, Any]] = entry.data.get("nicknames", {})
+
+    nickname = next(
+        (
+            name
+            for name in nicknames
+            if (DOMAIN, f"location_{name}") in device_entry.identifiers
+        ),
+        None,
+    )
+    if nickname is None:
+        return False
+
+    updated_nicknames = dict(nicknames)
+    del updated_nicknames[nickname]
+
+    hass.config_entries.async_update_entry(
+        entry,
+        data={**entry.data, "nicknames": updated_nicknames},
+    )
+    return True
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: NSWFuelConfigEntry) -> None:
