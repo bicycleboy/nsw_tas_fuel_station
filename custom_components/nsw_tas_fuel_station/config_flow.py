@@ -1168,8 +1168,9 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         nickname = form_values.get(CONF_NICKNAME)
 
         if nickname is None:
-            if self._config_entry is None and DEFAULT_NICKNAME not in self._flow_data.get(
-                "nicknames", {}
+            if (
+                self._config_entry is None
+                and DEFAULT_NICKNAME not in self._flow_data.get("nicknames", {})
             ):
                 nickname = DEFAULT_NICKNAME
             else:
