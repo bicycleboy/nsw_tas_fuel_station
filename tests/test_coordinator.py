@@ -270,3 +270,96 @@ def test_nicknames_property(coordinator: NSWFuelCoordinator) -> None:
     names = coordinator.nicknames
 
     assert names == ["Home"]
+
+
+async def test_refresh_accounts_for_api_operations(
+    coordinator: NSWFuelCoordinator, mock_api_client
+) -> None:
+    """A refresh accounts for favorite and cheapest API operations."""
+    await coordinator._async_update_data()
+
+    assert coordinator.last_refresh_api_operations == {
+        "favorite_station": 1,
+        "cheapest_nearby": 1,
+    }
+    assert coordinator.api_operations_total == 2
+    assert mock_api_client.get_fuel_prices_for_station.await_count == 1
+    assert mock_api_client.get_fuel_prices_within_radius.await_count == 1
+
+
+async def test_duplicate_favorite_station_is_fetched_once_per_refresh(
+    hass: HomeAssistant, mock_api_client
+) -> None:
+    """A favorite shared by nicknames is fetched once while Cheapest stays per nickname."""
+    shared_station = {
+        "station_code": STATION_NSW_A,
+        "au_state": "NSW",
+        "fuel_types": ["U91"],
+    }
+    nicknames = {
+        "Home": {
+            "location": {"latitude": HOME_LAT, "longitude": HOME_LNG},
+            "stations": [shared_station],
+        },
+        "Work": {
+            "location": {"latitude": HOME_LAT, "longitude": HOME_LNG},
+            "stations": [shared_station],
+        },
+    }
+    coordinator = NSWFuelCoordinator(
+        hass=hass,
+        api=mock_api_client,
+        nicknames=nicknames,
+        scan_interval=timedelta(minutes=5),
+    )
+
+    await coordinator._async_update_data()
+
+    assert coordinator.last_refresh_api_operations == {
+        "favorite_station": 1,
+        "cheapest_nearby": 2,
+    }
+    assert coordinator.api_operations_total == 3
+    assert mock_api_client.get_fuel_prices_for_station.await_count == 1
+    assert mock_api_client.get_fuel_prices_within_radius.await_count == 2
+
+
+async def test_refresh_logs_http_request_delta_when_client_supports_accounting(
+    coordinator: NSWFuelCoordinator, mock_api_client, caplog
+) -> None:
+    """A refresh logs HTTP request deltas when the client exposes counters."""
+    counts = {"oauth": 1, "data": 4, "retries": 0}
+    mock_api_client.http_request_counts = counts
+    mock_api_client.last_token_expires_in = 43200
+
+    async def _favorite_with_count(station_code: str, au_state: str):
+        counts["data"] += 1
+        return []
+
+    async def _cheapest_with_count(**kwargs):
+        counts["data"] += 2
+        counts["retries"] += 1
+        return []
+
+    mock_api_client.get_fuel_prices_for_station.side_effect = _favorite_with_count
+    mock_api_client.get_fuel_prices_within_radius.side_effect = _cheapest_with_count
+
+    with caplog.at_level("DEBUG"):
+        await coordinator._async_update_data()
+
+    assert "http_requests oauth=0 data=3 retries=1 total=3" in caplog.text
+    assert "session_http_total=8" in caplog.text
+    assert "token_expires_in=43200" in caplog.text
+
+
+async def test_refresh_works_without_client_http_accounting(
+    coordinator: NSWFuelCoordinator, mock_api_client, caplog
+) -> None:
+    """Released clients without HTTP counters retain logical-operation logging."""
+    mock_api_client.http_request_counts = None
+
+    with caplog.at_level("DEBUG"):
+        await coordinator._async_update_data()
+
+    assert "total_api_operations=2 session_total=2" in caplog.text
+    assert "http_requests oauth=" not in caplog.text

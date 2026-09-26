@@ -101,6 +101,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         self._managed_station_code: int | None = None
         self._managed_available_fuels: list[str] | None = None
         self._add_to_existing_nickname = False
+        self._api_operations_total = 0
 
     def is_matching(self, other_flow: Self) -> bool:
         """Return True if other_flow is matching this flow.
@@ -567,7 +568,12 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                         errors["base"] = "connection"
                     else:
                         try:
-                            nearby = await self.api.get_fuel_prices_within_radius(
+                            self._api_operations_total += 1
+            _LOGGER.debug(
+                "NSW Fuel API config-flow operation: station_discovery=1 flow_total=%d",
+                self._api_operations_total,
+            )
+            nearby = await self.api.get_fuel_prices_within_radius(
                                 latitude=lat,
                                 longitude=lon,
                                 radius=radius_km,

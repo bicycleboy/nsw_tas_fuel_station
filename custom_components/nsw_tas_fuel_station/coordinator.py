@@ -64,6 +64,11 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
         )
 
         self.api = api
+        self._api_operations_total = 0
+        self._last_refresh_api_operations: dict[str, int] = {
+            "favorite_station": 0,
+            "cheapest_nearby": 0,
+        }
 
         # Build a deduplicated set of station keys used for fetching prices
         self._station_keys: set[StationKey] = set()
@@ -99,10 +104,17 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
     async def _async_update_data(self) -> CoordinatorData:
         """Fetch updated fuel prices for all configured stations."""
-        try:
-            favorites = await self._update_favorite_stations()
+        refresh_operations = {
+            "favorite_station": 0,
+            "cheapest_nearby": 0,
+        }
+        self._last_refresh_api_operations = refresh_operations
+        http_before = self._http_request_snapshot()
 
-            cheapest = await self._update_cheapest_stations()
+        try:
+            favorites = await self._update_favorite_stations(refresh_operations)
+
+            cheapest = await self._update_cheapest_stations(refresh_operations)
 
         except NSWFuelApiClientAuthError:
             _LOGGER.error("Authentication failed")
@@ -118,12 +130,45 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
             _LOGGER.error("%s", msg)
             raise UpdateFailed(msg) from err
 
+        refresh_total = sum(refresh_operations.values())
+        http_after = self._http_request_snapshot()
+        http_delta = self._http_request_delta(http_before, http_after)
+
+        if http_delta is not None and http_after is not None:
+            _LOGGER.debug(
+                "NSW Fuel API refresh completed: favorites=%d cheapest=%d "
+                "total_api_operations=%d session_total=%d; "
+                "http_requests oauth=%d data=%d retries=%d total=%d "
+                "session_http_total=%d token_expires_in=%s",
+                refresh_operations["favorite_station"],
+                refresh_operations["cheapest_nearby"],
+                refresh_total,
+                self._api_operations_total,
+                http_delta["oauth"],
+                http_delta["data"],
+                http_delta["retries"],
+                http_delta["oauth"] + http_delta["data"],
+                http_after["oauth"] + http_after["data"],
+                getattr(self.api, "last_token_expires_in", None),
+            )
+        else:
+            _LOGGER.debug(
+                "NSW Fuel API refresh completed: favorites=%d cheapest=%d "
+                "total_api_operations=%d session_total=%d",
+                refresh_operations["favorite_station"],
+                refresh_operations["cheapest_nearby"],
+                refresh_total,
+                self._api_operations_total,
+            )
+
         return {
             "favorites": favorites,
             "cheapest": cheapest,
         }
 
-    async def _update_favorite_stations(self) -> dict[StationKey, dict[str, Price]]:
+    async def _update_favorite_stations(
+        self, operations: dict[str, int] | None = None
+    ) -> dict[StationKey, dict[str, Price]]:
         """Fetch prices for user's favorite stations.
 
         Returns:
@@ -141,6 +186,9 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
         favorites: dict[StationKey, dict[str, Price]] = {}
 
         for station_code, au_state in self._station_keys:
+            if operations is not None:
+                operations["favorite_station"] += 1
+                self._api_operations_total += 1
             prices: list[Price] = await self.api.get_fuel_prices_for_station(
                 str(station_code),
                 au_state,
@@ -152,7 +200,9 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
         return favorites
 
-    async def _update_cheapest_stations(self) -> dict[str, list[dict]]:
+    async def _update_cheapest_stations(
+        self, operations: dict[str, int] | None = None
+    ) -> dict[str, list[dict]]:
         """Fetch cheapest fuel prices per nickname.
 
         Returns:
@@ -184,6 +234,9 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 _LOGGER.warning("Nickname '%s' missing lat/lon, skipping", nickname)
                 continue
 
+            if operations is not None:
+                operations["cheapest_nearby"] += 1
+                self._api_operations_total += 1
             nearby = await self.api.get_fuel_prices_within_radius(
                 latitude=lat,
                 longitude=lon,
@@ -234,6 +287,38 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
             cheapest[nickname] = combined[:CHEAPEST_RESULTS_LIMIT]
 
         return cheapest
+
+    def _http_request_snapshot(self) -> dict[str, int] | None:
+        """Return client HTTP counters when supported by the installed client."""
+        counts = getattr(self.api, "http_request_counts", None)
+        if not isinstance(counts, dict):
+            return None
+
+        required = ("oauth", "data", "retries")
+        if not all(isinstance(counts.get(key), int) for key in required):
+            return None
+
+        return {key: counts[key] for key in required}
+
+    @staticmethod
+    def _http_request_delta(
+        before: dict[str, int] | None,
+        after: dict[str, int] | None,
+    ) -> dict[str, int] | None:
+        """Return per-refresh HTTP request deltas when client counters are available."""
+        if before is None or after is None:
+            return None
+        return {key: after[key] - before[key] for key in before}
+
+    @property
+    def last_refresh_api_operations(self) -> dict[str, int]:
+        """Return high-level API operations attempted by the last refresh."""
+        return dict(self._last_refresh_api_operations)
+
+    @property
+    def api_operations_total(self) -> int:
+        """Return high-level API operations completed in this coordinator session."""
+        return self._api_operations_total
 
     @property
     def nicknames(self) -> list[str]:
