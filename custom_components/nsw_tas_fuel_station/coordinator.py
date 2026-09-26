@@ -224,7 +224,7 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
             combined.sort(key=lambda x: x["price"])
 
             if len(combined) == 1:
-                _LOGGER.warning(
+                _LOGGER.debug(
                     "For nickname %s, NSW Fuel API returned only one station for lat=%s lon=%s. Try changing the location",
                     nickname,
                     lat,
