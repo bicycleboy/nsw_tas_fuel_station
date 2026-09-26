@@ -34,7 +34,7 @@
           "location": "Search location and radius",
           "nickname": "Location/nickname"
         },
-        "description": "Create a new location (e.g. \"Work\") or nickname (e.g. \"Diesel\") and select its initial station(s). Grouping by location/nickname allows you to have multiple \"cheapest\" sensors for different locations or fuel types.\n\nIf the location/nickname already exists, use *Add station to existing location/nickname* or the other reconfigure options instead.\n\nFor each location/nickname two \"cheapest\" sensors are created. The fuel type selected here sets the initial cheapest-fuel search for this new location/nickname.",
+        "description": "Create a new location (e.g. \"Work\") or nickname (e.g. \"Diesel\") and select its initial station(s). Grouping by location/nickname allows you to have multiple \"cheapest\" sensors for different locations or fuel types.\n\nIf the location/nickname already exists, use *Add station to existing location/nickname* or the other reconfigure options instead.\n\nFor each location/nickname two \"cheapest\" sensors are created. The fuel type selected here sets the initial cheapest-fuel search for this new location/nickname. The cheapest sensors are updated by the API based on the location and radius you set here. The \"favorite\" stations you select in the next step do not affect the cheapest sensors.",
         "title": "Add new location/nickname"
       },
       "station_select": {
@@ -94,11 +94,11 @@
       },
       "edit_nickname_settings": {
         "title": "Edit location/nickname settings",
-        "description": "Change the saved location and/or radius, cheapest-fuel search type, or cheapest-station exclusion text. This does not change favorite stations.",
+        "description": "Change the saved location and/or radius, cheapest-fuel search type, or cheapest-station exclusion text used for the cheapest sensors.\n\nThis option does not change your selected \"favorite\" stations.",
         "data": {
           "location": "Location and search radius",
-          "fuel_type": "Cheapest fuel type",
-          "exclude_string": "Exclude station names containing"
+          "fuel_type": "Fuel type for cheapest search",
+          "exclude_string": "Exclude from cheapest results"
         }
       },
       "confirm_delete_empty_nickname": {
@@ -127,10 +127,10 @@
       },
       "add_station_search": {
         "title": "Find station to add",
-        "description": "Choose where and how far to search, and the fuel type used to find stations. These search choices are used only to find the station and do not change the existing location/nickname's saved cheapest-fuel settings.",
+        "description": "Choose where and how far to search, and the fuel type used to find stations. These search choices are used only to find the station in the next step only.\n\nThis option does not change cheapest-fuel sensors.",
         "data": {
           "location": "Search location and radius",
-          "fuel_type": "Fuel type to find"
+          "fuel_type": "Search for stations using fuel type"
         }
       }
     }
