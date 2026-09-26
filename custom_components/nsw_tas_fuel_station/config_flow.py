@@ -200,12 +200,12 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 },
             }
         )
-
+        # Don't pass potentially stale flow data, schema build can use defaults
         if not self._nearby_station_prices:
             errors["base"] = "no_stations"
             return self.async_show_form(
                 step_id="add_nickname",
-                data_schema=self._build_add_nickname_schema(self._flow_data),
+                data_schema=self._build_add_nickname_schema(),
                 errors=errors,
             )
 
@@ -316,14 +316,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_mismatch()
 
         self._flow_data = dict(self._config_entry.data)
-        existing_nicknames = self._flow_data.get("nicknames", {})
-
-        if CONF_NICKNAME not in self._flow_data and existing_nicknames:
-            self._flow_data[CONF_NICKNAME] = (
-                DEFAULT_NICKNAME
-                if DEFAULT_NICKNAME in existing_nicknames
-                else next(iter(existing_nicknames))
-            )
 
         if self.api is None:
             self.api = NSWFuelApiClient(
@@ -331,9 +323,6 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
                 client_id=self._config_entry.data[CONF_CLIENT_ID],
                 client_secret=self._config_entry.data[CONF_CLIENT_SECRET],
             )
-
-        if user_input is not None:
-            return await self.async_step_add_nickname(user_input)
 
         return self.async_show_menu(
             step_id="reconfigure",
@@ -1176,14 +1165,17 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         form_values = user_input or {}
         existing_nickname: dict[str, Any] = {}
 
-        # Set nickname keeping any invalid nicknames for user correction
-        nickname = form_values.get(
-            CONF_NICKNAME,
-            self._flow_data.get(CONF_NICKNAME, DEFAULT_NICKNAME),
-        )
+        nickname = form_values.get(CONF_NICKNAME)
 
-        if isinstance(nickname, str):
-            existing_nickname = self._flow_data.get("nicknames", {}).get(nickname, {})
+        if nickname is None:
+            if self._config_entry is None and DEFAULT_NICKNAME not in self._flow_data.get(
+                "nicknames", {}
+            ):
+                nickname = DEFAULT_NICKNAME
+            else:
+                nickname = ""
+
+        existing_nickname = self._flow_data.get("nicknames", {}).get(nickname, {})
 
         default_location = {
             "latitude": getattr(self.hass.config, "latitude", None),
@@ -1243,8 +1235,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
             {
                 vol.Required(
                     CONF_NICKNAME,
-                    # "suggested" will also remind user of any invalid nickname entered
-                    description={"suggested_value": nickname},
+                    default=nickname,
                 ): TextSelector(),
                 vol.Required(
                     CONF_LOCATION,
@@ -1276,7 +1267,7 @@ class NSWFuelConfigFlow(ConfigFlow, domain=DOMAIN):
         radius_km: int = DEFAULT_RADIUS_KM,
         fuel_type: str = DEFAULT_FUEL_TYPE,
     ) -> dict[str, str]:
-        """Return a list of nearby stations from API.
+        """Fetch and cache a list of nearby stations from API.
 
         The API appears to balance price/distance regardless of the sort by setting.
         In NSW E10-U91 returns the most reliable/sensible results for "cheap nearby".
