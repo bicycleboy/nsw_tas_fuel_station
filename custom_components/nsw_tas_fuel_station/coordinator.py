@@ -34,6 +34,7 @@ from .const import (
     E10_AVAILABLE_STATES,
 )
 from .data import CoordinatorData, StationKey
+from .diagnostic_values import MAX_EXPIRY_SECONDS, diagnostic_counts, diagnostic_int
 
 if TYPE_CHECKING:
     from datetime import timedelta
@@ -111,6 +112,7 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
         self._last_refresh_api_operations = refresh_operations
         http_before = self._http_request_snapshot()
 
+        failure = None
         try:
             favorites = await self._update_favorite_stations(refresh_operations)
 
@@ -118,17 +120,21 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
         except NSWFuelApiClientAuthError:
             _LOGGER.error("Authentication failed")
-            raise ConfigEntryAuthFailed from None
+            failure = ConfigEntryAuthFailed()
 
-        except NSWFuelApiClientError as err:
-            msg = f"Error fetching NSW Fuel API: {err}"
+        except NSWFuelApiClientError:
+            msg = "Error fetching NSW Fuel API: acquisition failed"
             _LOGGER.error("%s", msg)
-            raise UpdateFailed(msg) from err
+            failure = UpdateFailed(msg)
 
-        except Exception as err:
-            msg = f"Unexpected error fetching data: {err}"
+        except Exception:  # noqa: BLE001 - isolate observers or classify acquisition failure
+            msg = "Unexpected error fetching FuelCheck data"
             _LOGGER.error("%s", msg)
-            raise UpdateFailed(msg) from err
+            failure = UpdateFailed(msg)
+
+        # Raise after leaving the handler so no raw acquisition context is kept.
+        if failure is not None:
+            raise failure from None
 
         refresh_total = sum(refresh_operations.values())
         http_after = self._http_request_snapshot()
@@ -149,7 +155,7 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 http_delta["retries"],
                 http_delta["oauth"] + http_delta["data"],
                 http_after["oauth"] + http_after["data"],
-                getattr(self.api, "last_token_expires_in", None),
+                diagnostic_int(self.api, "last_token_expires_in", MAX_EXPIRY_SECONDS),
             )
         else:
             _LOGGER.debug(
@@ -290,15 +296,9 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
     def _http_request_snapshot(self) -> dict[str, int] | None:
         """Return client HTTP counters when supported by the installed client."""
-        counts = getattr(self.api, "http_request_counts", None)
-        if not isinstance(counts, dict):
-            return None
-
-        required = ("oauth", "data", "retries")
-        if not all(isinstance(counts.get(key), int) for key in required):
-            return None
-
-        return {key: counts[key] for key in required}
+        return diagnostic_counts(
+            self.api, "http_request_counts", ("oauth", "data", "retries")
+        )
 
     @staticmethod
     def _http_request_delta(
@@ -308,7 +308,8 @@ class NSWFuelCoordinator(DataUpdateCoordinator[CoordinatorData]):
         """Return per-refresh HTTP request deltas when client counters are available."""
         if before is None or after is None:
             return None
-        return {key: after[key] - before[key] for key in before}
+        delta = {key: after[key] - before[key] for key in before}
+        return delta if all(value >= 0 for value in delta.values()) else None
 
     @property
     def last_refresh_api_operations(self) -> dict[str, int]:

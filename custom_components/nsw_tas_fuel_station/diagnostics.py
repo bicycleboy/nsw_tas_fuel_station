@@ -8,31 +8,42 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 from .data import NSWFuelConfigEntry
+from .diagnostic_values import (
+    MAX_EXPIRY_SECONDS,
+    diagnostic_counts,
+    diagnostic_int,
+    diagnostic_value,
+)
 
 
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: NSWFuelConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry without exposing credentials."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
-    api = coordinator.api
-
-    http_counts = getattr(api, "http_request_counts", None)
-    if not isinstance(http_counts, dict):
-        http_counts = None
+    domain_data = hass.data.get(DOMAIN)
+    coordinator = domain_data.get(entry.entry_id) if type(domain_data) is dict else None
+    api = diagnostic_value(coordinator, "api")
+    http_counts = diagnostic_counts(
+        api, "http_request_counts", ("oauth", "data", "retries")
+    )
+    http_total = (
+        http_counts["oauth"] + http_counts["data"] if http_counts is not None else None
+    )
 
     return {
         "api_request_accounting": {
-            "last_refresh_api_operations": coordinator.last_refresh_api_operations,
-            "session_api_operations_total": coordinator.api_operations_total,
-            "http_request_counts": dict(http_counts)
-            if http_counts is not None
-            else None,
-            "session_http_requests_total": (
-                http_counts.get("oauth", 0) + http_counts.get("data", 0)
-                if http_counts is not None
-                else None
+            "last_refresh_api_operations": diagnostic_counts(
+                coordinator,
+                "last_refresh_api_operations",
+                ("favorite_station", "cheapest_nearby"),
             ),
-            "last_token_expires_in": getattr(api, "last_token_expires_in", None),
+            "session_api_operations_total": diagnostic_int(
+                coordinator, "api_operations_total"
+            ),
+            "http_request_counts": http_counts,
+            "session_http_requests_total": http_total,
+            "last_token_expires_in": diagnostic_int(
+                api, "last_token_expires_in", MAX_EXPIRY_SECONDS
+            ),
         }
     }
